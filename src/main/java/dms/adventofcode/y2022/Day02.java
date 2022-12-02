@@ -23,7 +23,7 @@ public class Day02 extends CodeBase {
     }
 
     private static class PlayerRound {
-        PlayerChoice opponent;
+        PlayerChoice elf;
         PlayerChoice me;
     }
 
@@ -39,15 +39,15 @@ public class Day02 extends CodeBase {
             var playerRound = new PlayerRound();
             switch (lineParts[0].trim()) {
                 case "A": {
-                    playerRound.opponent = PlayerChoice.Rock;
+                    playerRound.elf = PlayerChoice.Rock;
                     break;
                 }
                 case "B": {
-                    playerRound.opponent = PlayerChoice.Paper;
+                    playerRound.elf = PlayerChoice.Paper;
                     break;
                 }
                 case "C": {
-                    playerRound.opponent = PlayerChoice.Scissors;
+                    playerRound.elf = PlayerChoice.Scissors;
                     break;
                 }
                 default: throw new RuntimeException("Invalid value for player 1. Line input: " + line);
@@ -56,7 +56,7 @@ public class Day02 extends CodeBase {
             switch (lineParts[1].trim()) {
                 // need to lose
                 case "X": {
-                    playerRound.me = switch (playerRound.opponent) {
+                    playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Scissors;
                         case Paper -> PlayerChoice.Rock;
                         case Scissors -> PlayerChoice.Paper;
@@ -65,7 +65,7 @@ public class Day02 extends CodeBase {
                 }
                 // need to draw
                 case "Y": {
-                    playerRound.me = switch (playerRound.opponent) {
+                    playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Rock;
                         case Paper -> PlayerChoice.Paper;
                         case Scissors -> PlayerChoice.Scissors;
@@ -74,7 +74,7 @@ public class Day02 extends CodeBase {
                 }
                 // need to win
                 case "Z": {
-                    playerRound.me = switch (playerRound.opponent) {
+                    playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Paper;
                         case Paper -> PlayerChoice.Scissors;
                         case Scissors -> PlayerChoice.Rock;
@@ -91,17 +91,17 @@ public class Day02 extends CodeBase {
 
     private static int calcPlayerRoundScore(PlayerRound playerRound) {
         return switch (playerRound.me) {
-            case Rock -> 1 + switch (playerRound.opponent) {
+            case Rock -> 1 + switch (playerRound.elf) {
                 case Rock -> 3;
                 case Paper -> 0;
                 case Scissors -> 6;
             };
-            case Paper -> 2 + switch (playerRound.opponent) {
+            case Paper -> 2 + switch (playerRound.elf) {
                 case Rock -> 6;
                 case Paper -> 3;
                 case Scissors -> 0;
             };
-            case Scissors -> 3 + switch (playerRound.opponent) {
+            case Scissors -> 3 + switch (playerRound.elf) {
                 case Rock -> 0;
                 case Paper -> 6;
                 case Scissors -> 3;
