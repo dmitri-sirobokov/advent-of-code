@@ -16,15 +16,16 @@ public class Day02 {
             switch (lineParts[0].trim()) {
                 case "forward": {
                     currentPosition.x += stepValue;
+                    currentPosition.z += currentPosition.aim * stepValue;
                     break;
                 }
                 case "down": {
-                    currentPosition.z += stepValue;
+                    currentPosition.aim += stepValue;
                     break;
                 }
 
                 case "up": {
-                    currentPosition.z -= stepValue;
+                    currentPosition.aim -= stepValue;
                     break;
                 }
                 default:
@@ -37,6 +38,7 @@ public class Day02 {
     private static class Position {
         long x;
         long z;
+        long aim;
     }
 
 }

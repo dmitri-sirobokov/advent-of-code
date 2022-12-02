@@ -14,7 +14,7 @@ class Day02Test extends TestBase {
         var input = readResourceFile("y2021/day2_sample.txt");
         var result = Day02.calcPositionProduct(input);
 
-        assertEquals(150, result);
+        assertEquals(900, result);
     }
 
     @Test
@@ -22,6 +22,6 @@ class Day02Test extends TestBase {
         var input = readResourceFile("y2021/day2.txt");
         var result = Day02.calcPositionProduct(input);
 
-        assertEquals(1989014, result);
+        assertEquals(2006917119, result);
     }
 }
