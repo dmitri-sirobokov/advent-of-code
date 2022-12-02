@@ -1,4 +1,4 @@
-package dms.adventofcode.y2022;
+package dms.adventofcode;
 
 import java.io.BufferedReader;
 import java.io.IOException;

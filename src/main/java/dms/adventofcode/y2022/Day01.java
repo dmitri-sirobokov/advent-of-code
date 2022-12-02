@@ -1,5 +1,6 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.CodeBase;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

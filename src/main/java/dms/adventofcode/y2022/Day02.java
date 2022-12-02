@@ -1,5 +1,7 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.CodeBase;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
