@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Day01Test {
+class Day01Test extends TestBase {
 
     @Test
     void findMaxCalories_Sample1() throws IOException {
@@ -40,14 +40,5 @@ class Day01Test {
         var result = Day01.calcTotCalories(input, 3);
 
         assertEquals(197291, result);
-    }
-
-    private String readResourceFile(String resourcePath) throws IOException {
-        try (var resourceStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
-            return IOUtils.toString(resourceStream, StandardCharsets.UTF_8);
-        }
-
-
-
     }
 }
