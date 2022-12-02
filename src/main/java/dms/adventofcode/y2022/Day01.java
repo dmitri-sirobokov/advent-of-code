@@ -1,6 +1,5 @@
 package dms.adventofcode.y2022;
 
-import dms.adventofcode.CodeBase;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Day01 extends CodeBase {
+public class Day01 {
 
     /**
      * @param input - input to the puzzle
@@ -16,7 +15,7 @@ public class Day01 extends CodeBase {
      * @return - Total number of the calories carried by the top elf's, specified by the parameter.
      * @throws IOException
      */
-    public static int calcTotCalories(String input, int top) throws IOException {
+    public static int calcTotCalories(List<String> input, int top) throws IOException {
         var calories = readCalories(input);
         calories.sort(Collections.reverseOrder());
         var sum = 0;
@@ -26,11 +25,10 @@ public class Day01 extends CodeBase {
         return sum;
     }
 
-    private static List<Integer> readCalories(String input) throws IOException {
+    private static List<Integer> readCalories(List<String> input) throws IOException {
         var resultList = new ArrayList<Integer>();
-        var lines = readLines(input);
         var totalCalories = 0;
-        for (var line : lines) {
+        for (var line : input) {
             if (StringUtils.isEmpty(line)) {
                 resultList.add(totalCalories);
                 totalCalories = 0;

@@ -1,14 +1,11 @@
 package dms.adventofcode.y2022;
 
-import dms.adventofcode.CodeBase;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Day02 extends CodeBase {
+public class Day02 {
 
-    public static int calcScore(String input) throws IOException {
+    public static int calcScore(List<String> input) {
         var playerRounds = readInput(input);
         var sum = 0;
         for (var playerRound : playerRounds) {
@@ -29,10 +26,9 @@ public class Day02 extends CodeBase {
         PlayerChoice me;
     }
 
-    private static List<PlayerRound> readInput(String input) throws IOException {
+    private static List<PlayerRound> readInput(List<String> input) {
         var result = new ArrayList<PlayerRound>();
-        var lines = readLines(input);
-        for (var line : lines) {
+        for (var line : input) {
             var lineParts = line.split(" ");
             if (lineParts.length != 2) {
                 throw new RuntimeException(

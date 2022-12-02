@@ -1,16 +1,12 @@
 package dms.adventofcode.y2021;
 
-import dms.adventofcode.CodeBase;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Day01 extends CodeBase {
+public class Day01 {
 
-    public static long countIncreases(String input, int windowSize) throws IOException {
-        var lines = readLines(input);
-        var measurements = lines.stream().mapToInt(Integer::parseInt).toArray();
+    public static long countIncreases(List<String> input, int windowSize) {
+        var measurements = input.stream().mapToInt(Integer::parseInt).toArray();
         var deviations = calcDeviations(measurements, windowSize);
         return deviations.stream().filter(i -> i > 0).count();
     }
