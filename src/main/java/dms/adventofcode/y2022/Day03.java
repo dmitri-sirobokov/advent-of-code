@@ -57,7 +57,6 @@ public class Day03 {
 
         for (var itemByteCode = 0; itemByteCode < compartmentDuplicates.length; itemByteCode++) {
             if (compartmentDuplicates[itemByteCode] == compartments.size()) {
-                // we found a duplicate, calculate the priority and add it to the sum
                 if (itemByteCode >= 'a' && itemByteCode <= 'z') {
                     compartmentsDuplicatePriority = 1 + itemByteCode - 'a';
                 } else {
