@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Day09 {
+public class Day09 extends CodeBase {
 
     public static long calcRiskLevel(List<String> input) {
-        int[][] levels = parseLevels(input);
+        int[][] levels = readMatrix(input);
         ArrayList<Position> lowestPoints = findLowestPositions(levels);
 
         return lowestPoints.stream().map(p -> 1 + levels[p.y][p.x])
@@ -15,7 +15,7 @@ public class Day09 {
     }
 
     public static int findLargestBasins(List<String> input) {
-        int[][] levels = parseLevels(input);
+        int[][] levels = readMatrix(input);
         ArrayList<Position> lowestPoints = findLowestPositions(levels);
 
         boolean[][] counted = new boolean[levels.length][levels[0].length];
@@ -69,17 +69,6 @@ public class Day09 {
             }
         }
         return lowestPoints;
-    }
-
-    private static int[][] parseLevels(List<String> input) {
-        var levels = new int[input.size()][input.get(0).length()];
-        for (var y = 0; y < input.size(); y++) {
-            var line = input.get(y);
-            for (var x = 0; x < line.length(); x++) {
-                levels[y][x] = line.charAt(x) - '0';
-            }
-        }
-        return levels;
     }
 
     private static class Position {

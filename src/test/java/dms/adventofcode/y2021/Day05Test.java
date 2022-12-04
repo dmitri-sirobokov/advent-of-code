@@ -38,6 +38,6 @@ class Day05Test extends TestBase {
         var input = readResourceFile("y2021/day5.txt");
         var result = Day05.countOverlapPoints(input, 2, true);
 
-        assertEquals(7414, result);
+        assertEquals(19676, result);
     }
 }
