@@ -44,21 +44,18 @@ public class Day06 {
             counter = 1;
         }
 
-        /** add a character to a window, and return true if the sequence in window is unique.
+        /** add a character to a window, and return true if the sequence in window is unique (does not contain duplicate characters).
          * @param ch - a character to add to a window
          * @return - return true if the sequence in window is unique.
          */
         public boolean add(char ch) {
-            var tailCharacterCount = --counters[window[pos]];
-            if (tailCharacterCount == 1) counter--;
+            if (--counters[window[pos]] == 1) counter--;
 
             window[pos] = ch;
 
-            var headCharacterCount = ++counters[ch];
-            if (headCharacterCount == 2) counter++;
+            if (++counters[window[pos]] == 2) counter++;
 
-            this.pos++;
-            if (this.pos == window.length) this.pos = 0;
+            if (++this.pos == window.length) this.pos = 0;
 
             return counter == 0;
         }
