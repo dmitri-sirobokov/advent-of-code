@@ -1,4 +1,4 @@
-package dms.adventofcode.y2022;
+package dms.adventofcode;
 
 import org.apache.commons.io.IOUtils;
 
@@ -10,8 +10,8 @@ import java.util.List;
 
 public class TestBase {
 
-    public List<String> readResourceFile(String resourcePath) throws IOException {
-        try (var resourceStream = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+    public static List<String> readResourceFile(String resourcePath) throws IOException {
+        try (var resourceStream = TestBase.class.getClassLoader().getResourceAsStream(resourcePath)) {
             return readLines(IOUtils.toString(resourceStream, StandardCharsets.UTF_8));
         }
     }

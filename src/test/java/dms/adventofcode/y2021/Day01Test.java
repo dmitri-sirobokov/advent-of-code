@@ -1,43 +1,29 @@
 package dms.adventofcode.y2021;
 
-import dms.adventofcode.y2022.TestBase;
-import org.junit.jupiter.api.Test;
+import dms.adventofcode.TestInput;
+import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class Day01Test extends TestBase {
+class Day01Test {
 
-    @Test
-    void countIncreases_Sample_Part1() throws IOException {
-        var input = readResourceFile("y2021/day1_sample.txt");
+    @ParameterizedTest
+    @TestInput(input = "y2021/day1_sample.txt", expected = "7")
+    @TestInput(input = "y2021/day1.txt", expected = "1121")
+    void countIncreases_Part1(List<String> input, int expected) {
         var result = Day01.countIncreases(input, 1);
 
-        assertEquals(7, result);
+        assertEquals(expected, result);
     }
 
-    @Test
-    void countIncreases_Input_Part1() throws IOException {
-        var input = readResourceFile("y2021/day1.txt");
-        var result = Day01.countIncreases(input, 1);
-
-        assertEquals(1121, result);
-    }
-
-    @Test
-    void countIncreases_Sample_Part2() throws IOException {
-        var input = readResourceFile("y2021/day1_sample.txt");
+    @ParameterizedTest
+    @TestInput(input = "y2021/day1_sample.txt", expected = "5")
+    @TestInput(input = "y2021/day1.txt", expected = "1065")
+    void countIncreases_Part2(List<String> input, int expected) {
         var result = Day01.countIncreases(input, 3);
 
-        assertEquals(5, result);
-    }
-
-    @Test
-    void countIncreases_Input_Part2() throws IOException {
-        var input = readResourceFile("y2021/day1.txt");
-        var result = Day01.countIncreases(input, 3);
-
-        assertEquals(1065, result);
+        assertEquals(expected, result);
     }
 }

@@ -1,5 +1,6 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.TestBase;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

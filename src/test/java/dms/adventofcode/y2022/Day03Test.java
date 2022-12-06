@@ -1,12 +1,13 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.TestBase;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Day03Test extends TestBase{
+class Day03Test extends TestBase {
 
     @Test
     void rucksackReorganizationPrioritySum_Sample() throws IOException {

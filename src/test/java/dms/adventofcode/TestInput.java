@@ -7,11 +7,15 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@ArgumentsSource(VariableArgumentsProvider.class)
-public @interface VariableSource {
+@Repeatable(value = TestInputs.class)
+@ArgumentsSource(TestInputProvider.class)
+public @interface TestInput {
 
     /**
      * The name of the static variable
      */
-    String value();
+    String input();
+
+    String expected() default "0";
 }
+
