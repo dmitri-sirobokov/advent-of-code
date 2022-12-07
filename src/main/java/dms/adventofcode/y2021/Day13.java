@@ -32,9 +32,9 @@ public class Day13 {
         for (var y = 0; y < dots.length; y++) {
             for (var x = 0; x < dots[y].length; x++) {
                 if (dots[y][x]) result++;
-                System.out.print(dots[y][x] ? '#' : ' ');
+                if (!justFirstFold) System.out.print(dots[y][x] ? '#' : ' ');
             }
-            System.out.println();
+            if (!justFirstFold) System.out.println();
 
         }
         return result;
