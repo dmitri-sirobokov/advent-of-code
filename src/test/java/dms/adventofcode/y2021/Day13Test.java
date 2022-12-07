@@ -1,29 +1,32 @@
 package dms.adventofcode.y2021;
 
-import dms.adventofcode.TestBase;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import dms.adventofcode.TestInput;
+import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("Under construction")
-class Day13Test extends TestBase {
+class Day13Test {
 
-    @Test
-    void countVisibleDots_Sample() throws IOException {
-        var input = readResourceFile("y2021/day13_sample.txt");
-        var result = Day13.countVisibleDots(input);
+    @ParameterizedTest
+    @TestInput(input = "y2021/day13_sample.txt", expected = "17")
+    @TestInput(input = "y2021/day13.txt", expected = "827")
+    void countVisibleDots_Part1(List<String> input, int expected) throws IOException {
+        var result = Day13.countVisibleDots(input, true);
 
-        assertEquals(17, result);
+        assertEquals(expected, result);
     }
 
-    @Test
-    void countVisibleDots_Input() throws IOException {
-        var input = readResourceFile("y2021/day13.txt");
-        var result = Day13.countVisibleDots(input);
+    @ParameterizedTest
+    @TestInput(input = "y2021/day13_sample.txt", expected = "16")
+    @TestInput(input = "y2021/day13.txt", expected = "0")
+    void countVisibleDots_Part2(List<String> input, int expected) throws IOException {
+        var result = Day13.countVisibleDots(input, false);
 
-        assertEquals(17, result);
+        assertEquals(expected, result);
     }
+
+
 }

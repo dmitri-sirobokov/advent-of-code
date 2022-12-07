@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Day13 {
 
-    public static int countVisibleDots(List<String> input) {
+    public static int countVisibleDots(List<String> input, boolean justFirstFold) {
         var dots = readDots(input);
         var foldInstructions = readFoldInstructions(input);
 
@@ -16,23 +16,37 @@ public class Day13 {
             boolean[][][] folds;
             if (foldInstruction.isX) {
                 folds = splitArrayX(dots, foldInstruction.position);
-                reverseArrayX(folds[0]);
+                reverseArrayX(folds[1]);
             } else {
                 folds = splitArrayY(dots, foldInstruction.position);
-                ArrayUtils.reverse(folds[0]);
+                ArrayUtils.reverse(folds[1]);
             }
 
             dots = mergeFolds(folds);
+            if (justFirstFold) {
+                break;
+            }
         }
 
-        return 0;
+        var result = 0;
+        for (var y = 0; y < dots.length; y++) {
+            for (var x = 0; x < dots[y].length; x++) {
+                if (dots[y][x]) result++;
+                System.out.print(dots[y][x] ? '#' : ' ');
+            }
+            System.out.println();
+
+        }
+        return result;
     }
 
     private static boolean[][] mergeFolds(boolean[][][] folds) {
         var result = new boolean[Math.max(folds[0].length, folds[1].length)][Math.max(folds[0][0].length, folds[1][0].length)];
-        for (var y = 0; y < result.length; y++) {
-            for (var x = 0; x < result[y].length; x++) {
-                result[y][x] = folds[0][y][x] | folds[1][y][x];
+        for (var k = 0; k < 2; k++) {
+            for (var y = 0; y < folds[k].length; y++) {
+                for (var x = 0; x < folds[k][y].length; x++) {
+                    result[y][x] |= folds[k][y][x];
+                }
             }
         }
         return result;
@@ -41,18 +55,18 @@ public class Day13 {
     private static boolean[][][] splitArrayY(boolean[][] array, int pos) {
         var result = new boolean[2][][];
         result[0] = Arrays.copyOf(array, pos);
-        result[1] = new boolean[array.length - pos - 1][array[0].length];
+        result[1] = Arrays.copyOf(array, array.length - pos - 1);
         System.arraycopy(array, pos + 1, result[1], 0, array.length - pos - 1);
         return result;
     }
 
     private static boolean[][][] splitArrayX(boolean[][] array, int pos) {
-        var result = new boolean[2][][];
+        var result = new boolean[2][array.length][];
         result[0] = new boolean[array.length][array[0].length - pos - 1];
         result[1] = new boolean[array.length][pos];
         for (var y = 0; y < array.length; y++) {
-            System.arraycopy(array[y], pos + 1, result[0], 0, array.length - pos - 1);
-            System.arraycopy(array[y], 0, result[1], 0, pos);
+            result[0][y] = Arrays.copyOfRange(array[y], pos + 1, array[y].length);
+            result[1][y] = Arrays.copyOfRange(array[y], 0, pos);
         }
         return result;
     }

@@ -3,10 +3,8 @@ package dms.adventofcode;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
-import org.junit.jupiter.params.support.AnnotationConsumer;
 
 import java.io.IOException;
-import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -32,8 +30,6 @@ class TestInputProvider implements ArgumentsProvider {
         return testInputs.stream().map(testInput ->
                 {
                     try {
-//                        var args = new ArrayList<>();
-//                        args.add(named(testInput.input(), TestBase.readResourceFile(testInput.input())));
                         return Arguments.of(
                                 named(testInput.input(), TestBase.readResourceFile(testInput.input())),
                                 testInput.expected().isEmpty() ? testInput.expected() : named(testInput.expected(), testInput.expected())
