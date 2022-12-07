@@ -21,10 +21,11 @@ class Day13Test {
 
     @ParameterizedTest
     @TestInput(input = "y2021/day13_sample.txt", expected = "16")
-    @TestInput(input = "y2021/day13.txt", expected = "0")
+    @TestInput(input = "y2021/day13.txt", expected = "104")
     void countVisibleDots_Part2(List<String> input, int expected) throws IOException {
         var result = Day13.countVisibleDots(input, false);
 
+        // Result value corresponds to the code: EAHKRECP, enable print results to show it in console
         assertEquals(expected, result);
     }
 
