@@ -1,5 +1,7 @@
 package dms.adventofcode.y2021;
 
+import dms.adventofcode.CodeBase;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,11 +53,6 @@ public class Day09 extends CodeBase {
         var lowestPoints = new ArrayList<Position>();
         for (var y = 0; y < levels.length; y++) {
             for (var x = 0; x < levels[y].length; x++) {
-                var y1 = y - 1;
-                var y2 = y + 1;
-                var x1 = x - 1;
-                var x2 = x + 1;
-
                 // test all adjacent points (4 directions)
                 var test1 = y - 1 < 0 || levels[y - 1][x] > levels[y][x];
                 var test2= y + 1 >= levels.length || levels[y + 1][x] > levels[y][x];
@@ -72,8 +69,8 @@ public class Day09 extends CodeBase {
     }
 
     private static class Position {
-        private int x;
-        private int y;
+        private final int x;
+        private final int y;
 
         public Position(int x, int y) {
             this.x = x;

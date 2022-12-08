@@ -1,5 +1,8 @@
 package dms.adventofcode.y2021;
 
+import dms.adventofcode.CodeBase;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class Day11 extends CodeBase {
@@ -20,7 +23,7 @@ public class Day11 extends CodeBase {
         var iterations = 1;
 
         // iterate until all octopuses flash in the same iteration
-        while (iteration(octopusMap) < octopusMap.length * octopusMap[0].length) {
+        while (iteration(octopusMap) < (long) octopusMap.length * octopusMap[0].length) {
             iterations++;
         }
 
@@ -29,12 +32,8 @@ public class Day11 extends CodeBase {
 
     /** Perform one operation step and return number of flashes
      *
-     * @param octopusMap
-     * @return
      */
-    private static int iteration(int[][] octopusMap) {
-        var iterationFlashes = 0;
-        // increase energy level of each octopus
+    private static long iteration(int[][] octopusMap) {
         for (int y = 0; y < octopusMap.length; y++) {
             for (var x = 0; x < octopusMap[y].length; x++) {
                 octopusMap[y][x]++;
@@ -51,14 +50,10 @@ public class Day11 extends CodeBase {
         }
 
         // count number of flashes
-        for (int y = 0; y < octopusMap.length; y++) {
-            for (var x = 0; x < octopusMap[y].length; x++) {
-                if (octopusMap[y][x] == 0) {
-                    iterationFlashes++;
-                }
-            }
-        }
-        return iterationFlashes;
+        return Arrays.stream(octopusMap)
+                .flatMapToInt(Arrays::stream)
+                .filter(energy -> energy == 0)
+                .count();
     }
 
     private static void flash(int[][] octopusMap, int x, int y) {
