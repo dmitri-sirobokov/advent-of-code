@@ -44,8 +44,8 @@ public class Day03 {
         for (var compartment : compartments) {
             byte[] compartmentItemsCount = new byte[256];
             var compartmentBytes = compartment.getBytes(StandardCharsets.UTF_8);
-            for (var i = 0; i < compartmentBytes.length; i++) {
-                compartmentItemsCount[compartmentBytes[i]]++;
+            for (byte compartmentByte : compartmentBytes) {
+                compartmentItemsCount[compartmentByte]++;
             }
 
             for (var itemByteCode = 0; itemByteCode < compartmentItemsCount.length; itemByteCode++) {

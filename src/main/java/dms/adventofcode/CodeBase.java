@@ -1,10 +1,10 @@
 package dms.adventofcode;
 
-import java.util.List;
+import java.util.*;
 
 public class CodeBase {
 
-    protected CodeBase() { }
+    public CodeBase() { }
 
     /** Read text lines into a matrix with numeric values where each value represents a digit from 0 to 9.
      * Example input:
@@ -27,5 +27,25 @@ public class CodeBase {
             }
         }
         return result;
+    }
+
+    protected static void forEach(int[][] matrix, MatrixForEachConsumer action) {
+        forEach(matrix[0].length, matrix.length, action);
+    }
+
+    protected static <T> void forEach(T[][] matrix, MatrixForEachConsumer action) {
+        forEach(matrix[0].length, matrix.length, action);
+    }
+
+    protected static void forEach(int rangeX, int rangeY, MatrixForEachConsumer action) {
+        for (var y = 0; y < rangeY; y++) {
+            for (var x = 0; x < rangeX; x++) {
+                action.apply(x, y);
+            }
+        }
+    }
+
+    public interface MatrixForEachConsumer {
+        void apply(int x, int y);
     }
 }

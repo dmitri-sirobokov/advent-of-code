@@ -30,8 +30,8 @@ public class Day07 {
      * @return Return the geometric mean value.
      */
     private static int calcMinFuelPosition(int[] positions, IntUnaryOperator fuelFunc) {
-        var min = Arrays.stream(positions).min().getAsInt();
-        var max = Arrays.stream(positions).max().getAsInt();
+        var min = Arrays.stream(positions).min().orElse(0);
+        var max = Arrays.stream(positions).max().orElse(0);
         var currentPosition = (max + min) / 2;
         var testDistance = (max - min) / 2;
         var minDist = calcFuelSum(positions, currentPosition, fuelFunc);

@@ -1,7 +1,5 @@
 package dms.adventofcode.y2021;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +26,9 @@ public class Day13 {
         }
 
         var result = 0;
-        for (var y = 0; y < dots.length; y++) {
-            for (var x = 0; x < dots[y].length; x++) {
-                if (dots[y][x]) result++;
+        for (var row : dots) {
+            for (var visible : row) {
+                if (visible) result++;
             }
         }
 
@@ -38,9 +36,9 @@ public class Day13 {
     }
 
     private static void printResult(boolean[][] dots) {
-        for (var y = 0; y < dots.length; y++) {
-            for (var x = 0; x < dots[y].length; x++) {
-                System.out.print(dots[y][x] ? '#' : '.');
+        for (boolean[] row : dots) {
+            for (boolean visible : row) {
+                System.out.print(visible ? '#' : '.');
             }
             System.out.println();
         }
@@ -62,9 +60,7 @@ public class Day13 {
 
     private static boolean[][] foldArrayY(boolean[][] array, int pos) {
         var result = new boolean[pos][array[0].length];
-        for (var y = 0; y < pos; y++) {
-            result[y] = array[y];
-        }
+        System.arraycopy(array, 0, result, 0, pos);
         var t = 2 * pos - array.length + 1;
         for (var y = 0; y < pos; y++) {
             if (y + t < result.length) {
@@ -88,12 +84,6 @@ public class Day13 {
         return result;
     }
 
-    private static void reverseArrayX(boolean[][] array) {
-        for (var y = 0; y < array.length; y++) {
-            ArrayUtils.reverse(array[y]);
-        }
-    }
-
     private static boolean[][] readDots(List<String> input) {
         var points = new ArrayList<Point>();
         for (var line : input) {
@@ -106,8 +96,8 @@ public class Day13 {
             points.add(point);
         }
 
-        var xMax = points.stream().mapToInt(p -> p.x).max().getAsInt();
-        var yMax = points.stream().mapToInt(p -> p.y).max().getAsInt();
+        var xMax = points.stream().mapToInt(p -> p.x).max().orElse(0);
+        var yMax = points.stream().mapToInt(p -> p.y).max().orElse(0);
         var result = new boolean[yMax + 1][xMax + 1];
         points.forEach(p -> result[p.y][p.x] = true);
         return result;

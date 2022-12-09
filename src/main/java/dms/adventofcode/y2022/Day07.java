@@ -26,8 +26,7 @@ public class Day07 {
                 .toList();
         var freeSpace = fs.totalSize - fs.currentDirectory.getSize();
         var needsToFree = 30000000 - freeSpace;
-        for (var i = 0; i < sortedDirectories.size(); i++) {
-            var dir = sortedDirectories.get(i);
+        for (Directory dir : sortedDirectories) {
             if (dir.getSize() >= needsToFree) {
                 return dir.getSize();
             }
@@ -131,8 +130,8 @@ public class Day07 {
     }
 
     private static class Directory extends Node {
-        private List<File> files = new ArrayList<>();
-        private List<Directory> directories = new ArrayList<>();
+        private final List<File> files = new ArrayList<>();
+        private final List<Directory> directories = new ArrayList<>();
 
         public Directory(Directory parent, String name) {
             super(parent, name);

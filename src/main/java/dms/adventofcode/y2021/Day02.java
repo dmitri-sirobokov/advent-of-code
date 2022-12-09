@@ -14,22 +14,13 @@ public class Day02 {
 
             var stepValue = Long.parseLong(lineParts[1].trim());
             switch (lineParts[0].trim()) {
-                case "forward": {
+                case "forward" -> {
                     currentPosition.x += stepValue;
                     currentPosition.z += currentPosition.aim * stepValue;
-                    break;
                 }
-                case "down": {
-                    currentPosition.aim += stepValue;
-                    break;
-                }
-
-                case "up": {
-                    currentPosition.aim -= stepValue;
-                    break;
-                }
-                default:
-                    throw new RuntimeException("Unrecognized value for movement step: " + line);
+                case "down" -> currentPosition.aim += stepValue;
+                case "up" -> currentPosition.aim -= stepValue;
+                default -> throw new RuntimeException("Unrecognized value for movement step: " + line);
             }
         }
         return currentPosition.x * currentPosition.z;

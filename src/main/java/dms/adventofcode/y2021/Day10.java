@@ -1,7 +1,6 @@
 package dms.adventofcode.y2021;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class Day10 {
     public static long repairScore(List<String> input) {
         // filter lines with errors, leave unclosed chunks only
         var nonCompletedChunks = input.stream()
-                .map(line -> errorScoreLine(line))
+                .map(Day10::errorScoreLine)
                 .filter(errorScore -> errorScore.score == 0)
                 .toList();
 

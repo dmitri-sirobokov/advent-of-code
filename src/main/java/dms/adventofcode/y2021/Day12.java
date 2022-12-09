@@ -156,13 +156,9 @@ public class Day12 {
                 return false;
             }
 
-            if (canVisitSingleSmallCaveTwice
-                    && smallCaveCounters.entrySet().stream().anyMatch(set -> set.getValue() > 1)
-                    && smallCaveCounters.getOrDefault(currentNode.name, 0) > 0) {
-                    return false;
-            }
-
-            return true;
+            return !canVisitSingleSmallCaveTwice
+                    || smallCaveCounters.entrySet().stream().noneMatch(set -> set.getValue() > 1)
+                    || smallCaveCounters.getOrDefault(currentNode.name, 0) <= 0;
         }
     }
 }

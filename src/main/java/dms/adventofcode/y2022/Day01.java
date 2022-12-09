@@ -2,7 +2,6 @@ package dms.adventofcode.y2022;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +12,8 @@ public class Day01 {
      * @param input - input to the puzzle
      * @param top - number of elves carrying the most calories
      * @return - Total number of the calories carried by the top elf's, specified by the parameter.
-     * @throws IOException
      */
-    public static int calcTotCalories(List<String> input, int top) throws IOException {
+    public static int calcTotCalories(List<String> input, int top) {
         var calories = readCalories(input);
         calories.sort(Collections.reverseOrder());
         var sum = 0;
@@ -25,7 +23,7 @@ public class Day01 {
         return sum;
     }
 
-    private static List<Integer> readCalories(List<String> input) throws IOException {
+    private static List<Integer> readCalories(List<String> input) {
         var resultList = new ArrayList<Integer>();
         var totalCalories = 0;
         for (var line : input) {

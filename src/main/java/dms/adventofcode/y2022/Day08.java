@@ -31,32 +31,22 @@ public class Day08 extends CodeBase {
         var levels = readMatrix(input);
         var trees = new TreeInfo[levels.length][levels[0].length];
 
-        for (var y = 0; y < levels.length; y++) {
-            for (var x = 0; x < levels[y].length; x++) {
+        forEach(levels, (x, y) -> {
                 var tree = new TreeInfo(levels[y][x]);
                 tree.visibleInX = true;
                 tree.visibleInY = true;
                 trees[y][x] = tree;
-            }
-        }
+        });
 
-        for (var y = 0; y < levels.length; y++) {
-            for (var x = 0; x < levels[y].length; x++) {
-                processVisibilityInX(trees, x, y);
-            }
-        }
+        forEach(levels, (x, y) -> processVisibilityInX(trees, x, y));
 
-        for (var y = 0; y < levels.length; y++) {
-            for (var x = 0; x < levels[y].length; x++) {
-                processVisibilityInY(trees, x, y);
-            }
-        }
+        forEach(levels, (x, y) -> processVisibilityInY(trees, x, y));
 
-        Arrays.stream(trees).forEach(rows -> Arrays.stream(rows)
+        Arrays.stream(trees).flatMap(Arrays::stream)
                 .forEach(tree -> {
                     tree.score = tree.countTop * tree.countBottom * tree.countLeft * tree.countRight;
                     tree.visible = tree.visibleInX || tree.visibleInY;
-                }));
+                });
 
 
         return trees;

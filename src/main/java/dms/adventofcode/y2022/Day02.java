@@ -32,54 +32,50 @@ public class Day02 {
             var lineParts = line.split(" ");
             if (lineParts.length != 2) {
                 throw new RuntimeException(
-                        String.format("Invalid line in the input '{}'. Each line should contain 2 columns seperated by space.", line));
+                        String.format("Invalid line in the input '%s'. Each line should contain 2 columns seperated by space.", line));
             }
             var playerRound = new PlayerRound();
             switch (lineParts[0].trim()) {
-                case "A": {
+                case "A" -> {
                     playerRound.elf = PlayerChoice.Rock;
-                    break;
                 }
-                case "B": {
+                case "B" -> {
                     playerRound.elf = PlayerChoice.Paper;
-                    break;
                 }
-                case "C": {
+                case "C" -> {
                     playerRound.elf = PlayerChoice.Scissors;
-                    break;
                 }
-                default: throw new RuntimeException("Invalid value for player 1. Line input: " + line);
+                default -> throw new RuntimeException("Invalid value for player 1. Line input: " + line);
             }
 
             switch (lineParts[1].trim()) {
                 // need to lose
-                case "X": {
+                case "X" -> {
                     playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Scissors;
                         case Paper -> PlayerChoice.Rock;
                         case Scissors -> PlayerChoice.Paper;
                     };
-                    break;
                 }
+
                 // need to draw
-                case "Y": {
+                case "Y" -> {
                     playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Rock;
                         case Paper -> PlayerChoice.Paper;
                         case Scissors -> PlayerChoice.Scissors;
                     };
-                    break;
                 }
+
                 // need to win
-                case "Z": {
+                case "Z" -> {
                     playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Paper;
                         case Paper -> PlayerChoice.Scissors;
                         case Scissors -> PlayerChoice.Rock;
                     };
-                    break;
                 }
-                default: throw new RuntimeException("Invalid value for player 2. Line input: " + line);
+                default -> throw new RuntimeException("Invalid value for player 2. Line input: " + line);
             }
 
             result.add(playerRound);

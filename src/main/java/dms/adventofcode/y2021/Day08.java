@@ -1,7 +1,6 @@
 package dms.adventofcode.y2021;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,23 +79,13 @@ public class Day08 {
             var patternOutput = patternParts[1];
             var patternOutputDigits = patternOutput.split(" ");
             var resultStr = Arrays.stream(patternOutputDigits).map(p -> resolveDigit(digitPatterns, p))
-                    .map(i -> i.toString())
+                    .map(Object::toString)
                     .collect(Collectors.joining());
             var resultInt = Integer.parseInt(resultStr);
             count += resultInt;
 
         }
         return count;
-    }
-
-    private static String turnOn(String current, String onSegments) {
-        for (var i = 0; i < onSegments.length(); i++) {
-            var onSegment = onSegments.substring(i, i + 1);
-            if (!current.contains(onSegment)) {
-                current += onSegment;
-            }
-        }
-        return current;
     }
 
     private static String turnOff(String current, String onSegments) {

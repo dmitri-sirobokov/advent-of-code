@@ -11,45 +11,72 @@ public class Day14 {
     }
 
     public static long part2(List<String> input) {
-        return calcSteps(input, 40);
+        return calcSteps(input, 30);
     }
 
-    private static Map<String, Character> readCodes(List<String> input) {
-        var result = new HashMap<String, Character>();
+    private static long calcSteps(List<String> input, int steps) {
+        var codes = readCodes(input);
+        String polymer = readPolymer(input);
+        var codeCounts = new long[256];
+        var pairCounts = new HashMap<CodePair, Integer>();
+
+        // increment character counts
+        for (var i = 0; i < polymer.length(); i++) {
+            codeCounts[polymer.charAt(i)]++;
+        }
+
+        // increment pair counts
+        for (var i = 0; i < polymer.length() - 1; i++) {
+            var codePair = new CodePair(polymer.charAt(i), polymer.charAt(i + 1));
+            pairCounts.putIfAbsent(codePair, 0);
+            pairCounts.compute(codePair, (key,value) -> value + 1);
+        }
+
+        for (var step = 0; step < steps; step++) {
+
+            var newPairCounts = new HashMap<CodePair, Integer>();
+            for (var pairEntrySet : pairCounts.entrySet()) {
+                if (pairEntrySet.getValue() > 0) {
+                    var insertChar = codes.get(pairEntrySet.getKey());
+                    codeCounts[insertChar] = codeCounts[insertChar] + pairEntrySet.getValue();
+                    var pair1 = new CodePair(pairEntrySet.getKey().first, insertChar);
+                    var pair2 = new CodePair(insertChar, pairEntrySet.getKey().second);
+                    newPairCounts.putIfAbsent(pairEntrySet.getKey(), 0);
+                    newPairCounts.putIfAbsent(pair1, 0);
+                    newPairCounts.putIfAbsent(pair2, 0);
+                    newPairCounts.compute(pairEntrySet.getKey(), (key, value) -> value - 1);
+                    newPairCounts.compute(pair1, (key, value) -> value + pairEntrySet.getValue());
+                    newPairCounts.compute(pair2, (key, value) -> value + pairEntrySet.getValue());
+                }
+            }
+            pairCounts = newPairCounts;
+        }
+
+        return Arrays.stream(codeCounts).max().orElse(0) - Arrays.stream(codeCounts).filter(c -> c != 0).min().orElse(0);
+    }
+
+    private static String readPolymer(List<String> input) {
+        return input.get(0);
+    }
+
+    private static Map<CodePair, Character> readCodes(List<String> input) {
+        var result = new HashMap<CodePair, Character>();
         for (var i = 2; i < input.size(); i++) {
             var line = input.get(i);
             var lineParts = line.split(" -> ");
-            result.put(lineParts[0], lineParts[1].charAt(0));
+
+            result.put(new CodePair(lineParts[0].charAt(0), lineParts[0].charAt(1)),
+                    lineParts[1].charAt(0));
         }
         return result;
     }
 
-    private static class CodeStep {
-        private byte[] charsCount;
-    }
+    private record CodePair (char first, char second) { }
 
-    private static long calcSteps(List<String> input, int steps) {
-        var polymer = input.get(0);
+    private static class Polymer {
 
-        var codes = readCodes(input);
-        for (var step = 0; step < steps; step++) {
-            var sb = new StringBuilder();
-            sb.append(polymer.charAt(0));
-            for (var i = 0; i < polymer.length() - 1; i++) {
-                var key = polymer.substring(i, i + 2);
-                var insertCode = codes.get(key);
-                if (insertCode != null) {
-                    sb.append(insertCode);
-                }
-                sb.append(key.charAt(1));
-            }
-            polymer = sb.toString();
+        public Polymer(CharSequence initialChain) {
+
         }
-
-        var charCounts = new int[256];
-        for (var i = 0; i < polymer.length(); i++) {
-            charCounts[polymer.charAt(i)]++;
-        }
-        return Arrays.stream(charCounts).asLongStream().max().getAsLong() - Arrays.stream(charCounts).asLongStream().filter(c -> c != 0).min().getAsLong();
     }
 }
