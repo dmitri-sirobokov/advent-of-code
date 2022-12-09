@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Day 9: Rope Bridge
+ */
 public class Day09 extends CodeBase {
 
     public static long part1(List<String> input) {

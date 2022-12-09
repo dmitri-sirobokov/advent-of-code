@@ -11,14 +11,14 @@ public class Day14 {
     }
 
     public static long part2(List<String> input) {
-        return calcSteps(input, 30);
+        return calcSteps(input, 40);
     }
 
     private static long calcSteps(List<String> input, int steps) {
         var codes = readCodes(input);
         String polymer = readPolymer(input);
         var codeCounts = new long[256];
-        var pairCounts = new HashMap<CodePair, Integer>();
+        var pairCounts = new HashMap<CodePair, Long>();
 
         // increment character counts
         for (var i = 0; i < polymer.length(); i++) {
@@ -28,23 +28,22 @@ public class Day14 {
         // increment pair counts
         for (var i = 0; i < polymer.length() - 1; i++) {
             var codePair = new CodePair(polymer.charAt(i), polymer.charAt(i + 1));
-            pairCounts.putIfAbsent(codePair, 0);
+            pairCounts.putIfAbsent(codePair, 0L);
             pairCounts.compute(codePair, (key,value) -> value + 1);
         }
 
         for (var step = 0; step < steps; step++) {
 
-            var newPairCounts = new HashMap<CodePair, Integer>();
+            var newPairCounts = new HashMap<CodePair, Long>();
             for (var pairEntrySet : pairCounts.entrySet()) {
                 if (pairEntrySet.getValue() > 0) {
                     var insertChar = codes.get(pairEntrySet.getKey());
                     codeCounts[insertChar] = codeCounts[insertChar] + pairEntrySet.getValue();
                     var pair1 = new CodePair(pairEntrySet.getKey().first, insertChar);
                     var pair2 = new CodePair(insertChar, pairEntrySet.getKey().second);
-                    newPairCounts.putIfAbsent(pairEntrySet.getKey(), 0);
-                    newPairCounts.putIfAbsent(pair1, 0);
-                    newPairCounts.putIfAbsent(pair2, 0);
-                    newPairCounts.compute(pairEntrySet.getKey(), (key, value) -> value - 1);
+                    newPairCounts.putIfAbsent(pairEntrySet.getKey(), 0L);
+                    newPairCounts.putIfAbsent(pair1, 0L);
+                    newPairCounts.putIfAbsent(pair2, 0L);
                     newPairCounts.compute(pair1, (key, value) -> value + pairEntrySet.getValue());
                     newPairCounts.compute(pair2, (key, value) -> value + pairEntrySet.getValue());
                 }
