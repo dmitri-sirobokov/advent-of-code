@@ -89,8 +89,5 @@ public class Day10 {
             return closeTokens[ch] != null;
         }
     }
-
-    private record ErrorScore (int score, List<Chunk> openChunks, String line) {
-
-    }
+    private record ErrorScore (int score, List<Chunk> openChunks, String line) {  }
 }

@@ -1,14 +1,12 @@
 package dms.adventofcode.y2021;
 
 import dms.adventofcode.TestInput;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-// @Disabled("Under Construction (fail with memory usage)")
 class Day14Test {
 
     @ParameterizedTest

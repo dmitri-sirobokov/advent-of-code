@@ -36,45 +36,34 @@ public class Day02 {
             }
             var playerRound = new PlayerRound();
             switch (lineParts[0].trim()) {
-                case "A" -> {
-                    playerRound.elf = PlayerChoice.Rock;
-                }
-                case "B" -> {
-                    playerRound.elf = PlayerChoice.Paper;
-                }
-                case "C" -> {
-                    playerRound.elf = PlayerChoice.Scissors;
-                }
+                case "A" -> playerRound.elf = PlayerChoice.Rock;
+                case "B" -> playerRound.elf = PlayerChoice.Paper;
+                case "C" -> playerRound.elf = PlayerChoice.Scissors;
                 default -> throw new RuntimeException("Invalid value for player 1. Line input: " + line);
             }
 
             switch (lineParts[1].trim()) {
                 // need to lose
-                case "X" -> {
-                    playerRound.me = switch (playerRound.elf) {
+                case "X" -> playerRound.me = switch (playerRound.elf) {
                         case Rock -> PlayerChoice.Scissors;
                         case Paper -> PlayerChoice.Rock;
                         case Scissors -> PlayerChoice.Paper;
-                    };
-                }
+
+                };
 
                 // need to draw
-                case "Y" -> {
-                    playerRound.me = switch (playerRound.elf) {
-                        case Rock -> PlayerChoice.Rock;
-                        case Paper -> PlayerChoice.Paper;
-                        case Scissors -> PlayerChoice.Scissors;
-                    };
-                }
+                case "Y" -> playerRound.me = switch (playerRound.elf) {
+                    case Rock -> PlayerChoice.Rock;
+                    case Paper -> PlayerChoice.Paper;
+                    case Scissors -> PlayerChoice.Scissors;
+                };
 
                 // need to win
-                case "Z" -> {
-                    playerRound.me = switch (playerRound.elf) {
-                        case Rock -> PlayerChoice.Paper;
-                        case Paper -> PlayerChoice.Scissors;
-                        case Scissors -> PlayerChoice.Rock;
-                    };
-                }
+                case "Z" -> playerRound.me = switch (playerRound.elf) {
+                    case Rock -> PlayerChoice.Paper;
+                    case Paper -> PlayerChoice.Scissors;
+                    case Scissors -> PlayerChoice.Rock;
+                };
                 default -> throw new RuntimeException("Invalid value for player 2. Line input: " + line);
             }
 
