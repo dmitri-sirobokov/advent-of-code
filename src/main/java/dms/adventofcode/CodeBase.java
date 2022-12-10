@@ -1,6 +1,6 @@
 package dms.adventofcode;
 
-import java.util.*;
+import java.util.List;
 
 public class CodeBase {
 
@@ -43,6 +43,17 @@ public class CodeBase {
                 action.apply(x, y);
             }
         }
+    }
+
+    protected static String arrayToString(boolean[][] array) {
+        var result = new StringBuilder();
+        for (var row : array) {
+            for (var cell : row) {
+                result.append(cell ? '#' : '.');
+            }
+            result.append("\n");
+        }
+        return result.toString();
     }
 
     public interface MatrixForEachConsumer {

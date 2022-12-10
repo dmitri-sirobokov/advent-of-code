@@ -1,12 +1,14 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.CodeBase;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Day 10: Cathode-Ray Tube
  */
-public class Day10 {
+public class Day10 extends CodeBase {
 
     public static long part1(List<String> input) {
         var crtState = runInstructions(input);
@@ -14,16 +16,8 @@ public class Day10 {
     }
 
     public static String part2(List<String> input) {
-        CrtState crtState = runInstructions(input);
-
-        var result = new StringBuilder();
-        for (var pixelsRow : crtState.pixels) {
-            for (var pixel : pixelsRow) {
-                result.append(pixel ? '#' : '.');
-            }
-            result.append("\n");
-        }
-        return result.toString();
+        var crtState = runInstructions(input);
+        return arrayToString(crtState.pixels);
     }
 
     private static CrtState runInstructions(List<String> input) {
