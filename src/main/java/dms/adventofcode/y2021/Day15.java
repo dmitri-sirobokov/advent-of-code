@@ -19,6 +19,23 @@ public class Day15 extends CodeBase {
         }
 
         findBestNextNode(nodes[0][0], nodes[9][9], nodes, risks);
+
+        var pathGrid = new boolean[10][10];
+        var node = nodes[0][0];
+        while (node != null) {
+
+            System.out.println(risks[node.position.y][node.position.x]);
+            pathGrid[node.position.y][node.position.x] = true;
+            node = node.nextNode;
+        }
+
+        for (var y = 0; y < nodes.length; y++) {
+            for (var x = 0; x < nodes[0].length ; x++) {
+                var printStr = pathGrid[y][x] ? " [" + risks[y][x] + "]" : "  " + risks[y][x] + " ";
+                System.out.print(printStr);
+            }
+            System.out.println();
+        }
         return nodes[0][0].bestRisk;
     }
 
@@ -27,21 +44,16 @@ public class Day15 extends CodeBase {
      */
     private static void findBestNextNode(Node current, Node to,
                                          Node[][] nodes, int[][] risks) {
-        if (current.position.x < 0 || current.position.x >= nodes[0].length ||
-                current.position.y < 0 || current.position.y >= nodes.length) {
+        if (current.visiting || current.nextNode != null) {
             return;
         }
 
-        if (current.visiting) {
-            return;
-        }
-
-        current.bestRisk = risks[current.position.y][current.position.x];
         if (current.equals(to)) {
             // we reach the end, set best path
             return;
         }
 
+        // recursively calculate the lowest risk of adjacent nodes
         current.visiting = true;
         var dx = new int[] { -1, 0, 0, 1 };
         var dy = new int[] { 0, -1, 1, 0 };
@@ -50,9 +62,18 @@ public class Day15 extends CodeBase {
             var nextPosition = new Position(current.position.x + dx[k], current.position.y + dy[k]);
             if (nextPosition.x >= 0 && nextPosition.y >= 0 && nextPosition.x < nodes[0].length && nextPosition.y < nodes.length) {
                 var nextNode = nodes[nextPosition.y][nextPosition.x];
-                if (!nextNode.visiting && nextNode.bestPath == null) {
-                    findBestNextNode(nextNode, to, nodes, risks);
+                if (nextNode.equals(to)) {
+                    nextNode.bestRisk = risks[nextNode.position.y][nextNode.position.x];
+                    nextNodes.clear();
                     nextNodes.add(nextNode);
+                    break;
+                }
+                if (!nextNode.visiting) {
+                    findBestNextNode(nextNode, to, nodes, risks);
+                    if (nextNode.nextNode != null) nextNodes.add(nextNode);
+                } else {
+                    nextNodes.clear();
+                    break;
                 }
             }
         }
@@ -62,9 +83,10 @@ public class Day15 extends CodeBase {
                 .orElse(null);
 
         if (bestNode != null) {
-            current.bestPath = bestNode;
+            current.nextNode = bestNode;
             current.bestRisk = risks[current.position.y][current.position.x] + bestNode.bestRisk;
         }
+        return;
     }
 
     public static long part2(List<String> input) {
@@ -75,7 +97,7 @@ public class Day15 extends CodeBase {
         private final Position position;
 
         // Link to the best node for the best path (with the lowest risk).
-        private Node bestPath;
+        private Node nextNode;
 
         // The sum of all risks in the path from this node to end (if following best path)
         private int bestRisk;
