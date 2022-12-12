@@ -1,5 +1,6 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.CodeBase;
 import dms.adventofcode.Graph;
 
 import java.util.ArrayList;
@@ -8,8 +9,9 @@ import java.util.List;
 /**
  * Day 12: Hill Climbing Algorithm
  */
-public class Day12 {
+public class Day12 extends CodeBase {
 
+    @SuppressWarnings("CommentedOutCode")
     public static long part1(List<String> input) {
         var graph = readGraph(input);
         var paths = graph.findShortestPath(graph.start);
@@ -77,21 +79,10 @@ public class Day12 {
             }
         }
 
-        for (var y = 0; y < nodes.length; y++) {
-            for (var x = 0; x < nodes[y].length; x++) {
-                var dx = new int[]{-1, 0, 0, 1};
-                var dy = new int[]{0, 1, -1, 0};
-                for (var k = 0; k < 4; k++) {
-                    var destinationPos = new Position(x + dx[k], y + dy[k]);
-                    if (destinationPos.x >= 0 && destinationPos.x < nodes[0].length && destinationPos.y >= 0 && destinationPos.y < nodes.length) {
-                        var destinationNode = nodes[destinationPos.y][destinationPos.x];
-                        var sourceNode = nodes[y][x];
-                        int weight = destinationNode.height - sourceNode.height > 1 ? 1000000 : 1;
-                        graph.addEdge(sourceNode, destinationNode, weight);
-                    }
-                }
-            }
-        }
+        forEachAdjacent(nodes, (source, dest) -> {
+            int weight = dest.height - source.height > 1 ? 1000000 : 1;
+            graph.addEdge(source, dest, weight);
+        });
         return graph;
     }
 
@@ -106,6 +97,6 @@ public class Day12 {
         private GraphNode start;
         private GraphNode end;
 
-        private List<GraphNode> starts = new ArrayList<>();
+        private final List<GraphNode> starts = new ArrayList<>();
     }
 }

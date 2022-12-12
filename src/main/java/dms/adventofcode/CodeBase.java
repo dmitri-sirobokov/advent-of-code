@@ -1,5 +1,6 @@
 package dms.adventofcode;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 public class CodeBase {
@@ -26,6 +27,7 @@ public class CodeBase {
                 result[y][x] = line.charAt(x) - '0';
             }
         }
+
         return result;
     }
 
@@ -45,6 +47,22 @@ public class CodeBase {
         }
     }
 
+    protected static <T> void forEachAdjacent(T[][] matrix, MatrixForEachAdjacentConsumer<T> action) {
+        for (var y = 0; y < matrix.length; y++) {
+            for (var x = 0; x < matrix[y].length; x++) {
+                var dx = new int[]{-1, 0, 0, 1};
+                var dy = new int[]{0, -1, 1, 0};
+                for (var k = 0; k < 4; k++) {
+                    var adjX = x + dx[k];
+                    var adjY = y + dy[k];
+                    if (adjX >= 0 && adjX < matrix[0].length && adjY >= 0 && adjY < matrix.length) {
+                        action.apply(matrix[y][x], matrix[adjY][adjX]);
+                    }
+                }
+            }
+        }
+    }
+
     protected static String arrayToString(boolean[][] array) {
         var result = new StringBuilder();
         for (var row : array) {
@@ -56,7 +74,40 @@ public class CodeBase {
         return result.toString();
     }
 
+    @SuppressWarnings("unchecked")
+    protected static <T> T[][] mapArray(int[][] array, MapArrayFunctionXY<T, Integer> func) {
+        var resultUntyped = new Object[array.length][array[0].length];
+        for (var y = 0; y < array.length; y++) {
+            for (var x = 0; x < array[y].length; x++) {
+                resultUntyped[y][x] = func.apply(x, y, array[y][x]);
+            }
+        }
+        var result = (T[][])Array.newInstance(resultUntyped[0][0].getClass(), resultUntyped.length, resultUntyped[0].length);
+        for (var y = 0; y < array.length; y++) {
+            for (var x = 0; x < array[y].length; x++) {
+                result[y][x] = (T)resultUntyped[y][x];
+            }
+        }
+        return result;
+    }
+
+    protected static <T> T[][] mapArray(int[][] array, MapArrayFunction<T, Integer> func) {
+        return mapArray(array, (x, y, value) -> func.apply(value));
+    }
+
     public interface MatrixForEachConsumer {
         void apply(int x, int y);
+    }
+
+    public interface MatrixForEachAdjacentConsumer<T> {
+        void apply(T element, T adjacent);
+    }
+
+    public interface MapArrayFunction<R, V> {
+        R apply(V value);
+    }
+
+    public interface MapArrayFunctionXY<R, V> {
+        R apply(int x, int y, V value);
     }
 }

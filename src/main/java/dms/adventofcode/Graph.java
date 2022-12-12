@@ -4,13 +4,13 @@ import java.util.*;
 
 public class Graph<T> {
 
-    private HashMap<T, PriorityNode<T>> map = new HashMap<>();
+    private final HashMap<T, PriorityNode<T>> map = new HashMap<>();
 
     public void addEdge(T source, T destination, int weight) {
-        var sourcePriorityNode = map.computeIfAbsent(source, value -> new PriorityNode<>(value));
-        var destinationPriorityNode = map.computeIfAbsent(destination, value -> new PriorityNode<>(value));
+        var sourcePriorityNode = map.computeIfAbsent(source, PriorityNode::new);
+        var destinationPriorityNode = map.computeIfAbsent(destination, PriorityNode::new);
         var edges = edgesMap.computeIfAbsent(sourcePriorityNode, (key) -> new ArrayList<>());
-        edges.add(new PriorityEdge<T>(sourcePriorityNode, destinationPriorityNode, weight));
+        edges.add(new PriorityEdge<>(sourcePriorityNode, destinationPriorityNode, weight));
     }
 
     public ShortestPathResult<T> findShortestPath(T source) {
@@ -21,7 +21,7 @@ public class Graph<T> {
         for (var node : edgesMap.keySet()) {
             node.priority = Integer.MAX_VALUE;
             node.dequeued = false;
-        };
+        }
         sourcePriorityNode.priority = 0;
         pq.addAll(edgesMap.keySet());
 
@@ -61,7 +61,7 @@ public class Graph<T> {
 
             }
         }
-        return new ShortestPathResult<T>(source, weights, parents);
+        return new ShortestPathResult<>(source, weights, parents);
     }
 
     private final Map<PriorityNode<T>, List<PriorityEdge<T>>> edgesMap = new HashMap<>();

@@ -1,114 +1,70 @@
 package dms.adventofcode.y2021;
 
 import dms.adventofcode.CodeBase;
+import dms.adventofcode.Graph;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 public class Day15 extends CodeBase {
 
     public static long part1(List<String> input) {
-        var risks = readMatrix(input);
-        var nodes = new Node[risks.length][risks[0].length];
-        for (var y = 0; y < nodes.length; y++) {
-            for (var x = 0; x < nodes[y].length; x++) {
-                nodes[y][x] = new Node(new Position(x, y));
-            }
-        }
-
-        findBestNextNode(nodes[0][0], nodes[9][9], nodes, risks);
-
-        var pathGrid = new boolean[10][10];
-        var node = nodes[0][0];
-        while (node != null) {
-
-            System.out.println(risks[node.position.y][node.position.x]);
-            pathGrid[node.position.y][node.position.x] = true;
-            node = node.nextNode;
-        }
-
-        for (var y = 0; y < nodes.length; y++) {
-            for (var x = 0; x < nodes[0].length ; x++) {
-                var printStr = pathGrid[y][x] ? " [" + risks[y][x] + "]" : "  " + risks[y][x] + " ";
-                System.out.print(printStr);
-            }
-            System.out.println();
-        }
-        return nodes[0][0].bestRisk;
-    }
-
-    /**
-     * Find next best node in the best path with the lowest total risk
-     */
-    private static void findBestNextNode(Node current, Node to,
-                                         Node[][] nodes, int[][] risks) {
-        if (current.visiting || current.nextNode != null) {
-            return;
-        }
-
-        if (current.equals(to)) {
-            // we reach the end, set best path
-            return;
-        }
-
-        // recursively calculate the lowest risk of adjacent nodes
-        current.visiting = true;
-        var dx = new int[] { -1, 0, 0, 1 };
-        var dy = new int[] { 0, -1, 1, 0 };
-        var nextNodes = new ArrayList<Node>();
-        for (var k = 0; k < 4; k++) {
-            var nextPosition = new Position(current.position.x + dx[k], current.position.y + dy[k]);
-            if (nextPosition.x >= 0 && nextPosition.y >= 0 && nextPosition.x < nodes[0].length && nextPosition.y < nodes.length) {
-                var nextNode = nodes[nextPosition.y][nextPosition.x];
-                if (nextNode.equals(to)) {
-                    nextNode.bestRisk = risks[nextNode.position.y][nextNode.position.x];
-                    nextNodes.clear();
-                    nextNodes.add(nextNode);
-                    break;
-                }
-                if (!nextNode.visiting) {
-                    findBestNextNode(nextNode, to, nodes, risks);
-                    if (nextNode.nextNode != null) nextNodes.add(nextNode);
-                } else {
-                    nextNodes.clear();
-                    break;
-                }
-            }
-        }
-        current.visiting = false;
-        var bestNode = nextNodes.stream()
-                .filter(Objects::nonNull).min(Comparator.comparingInt(node -> node.bestRisk))
-                .orElse(null);
-
-        if (bestNode != null) {
-            current.nextNode = bestNode;
-            current.bestRisk = risks[current.position.y][current.position.x] + bestNode.bestRisk;
-        }
-        return;
+        return shortestPath(input, 1);
     }
 
     public static long part2(List<String> input) {
-        return 0;
+        return shortestPath(input, 5);
     }
 
+
+    private static Integer shortestPath(List<String> input, int duplicateCount) {
+        var risks = readMatrix(input);
+        risks = duplicate(risks, duplicateCount);
+        var graph = createGraph(risks);
+
+        var result = graph.findShortestPath(graph.start);
+
+        return result.weights().get(graph.end);
+    }
+
+    private static int[][] duplicate(int[][] risks, int duplicateCount) {
+        var result = new int[risks.length * duplicateCount][risks[0].length * duplicateCount];
+        for (var repeatX = 0; repeatX < duplicateCount; repeatX++) {
+            for (var repeatY = 0; repeatY < duplicateCount; repeatY++) {
+                for (var y = 0; y < risks.length; y++) {
+                    for (var x = 0; x < risks[y].length; x++) {
+                        result[repeatY * risks.length + y][repeatX * risks[0].length + x] = (risks[y][x] + repeatX + repeatY - 1) % 9 + 1;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private static RiskGraph createGraph(int[][] risks) {
+        var graph = new RiskGraph();
+        var graphNodes = mapArray(risks, (x, y, element) -> new Node(risks[y][x]));
+        forEachAdjacent(graphNodes, (source, dest) -> graph.addEdge(source, dest, dest.risk));
+
+        graph.start = graphNodes[0][0];
+        graph.end = graphNodes[graphNodes.length - 1][graphNodes[0].length - 1];
+        return graph;
+    }
+
+    // Making this class a record will have a side effect, it generates non-unique cache for hashmaps.
+    @SuppressWarnings("ClassCanBeRecord")
     private static class Node {
-        private final Position position;
+        private final int risk;
 
-        // Link to the best node for the best path (with the lowest risk).
-        private Node nextNode;
-
-        // The sum of all risks in the path from this node to end (if following best path)
-        private int bestRisk;
-
-        private boolean visiting;
-
-        public Node(Position position) {
-            this.position = position;
+        public Node(int risk) {
+            this.risk = risk;
         }
     }
 
     private record Position(int x, int y) { }
+
+    private static class RiskGraph extends Graph<Node> {
+        private Node start;
+        private Node end;
+    }
 
 }
