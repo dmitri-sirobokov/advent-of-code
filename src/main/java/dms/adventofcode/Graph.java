@@ -4,77 +4,81 @@ import java.util.*;
 
 public class Graph<T> {
 
+    private HashMap<T, PriorityNode<T>> map = new HashMap<>();
+
     public void addEdge(T source, T destination, int weight) {
-        var edges = edgesMap.computeIfAbsent(source, (key) -> new ArrayList<>());
-        edges.add(new Edge(source, destination, weight));
+        var sourcePriorityNode = map.computeIfAbsent(source, value -> new PriorityNode<>(value));
+        var destinationPriorityNode = map.computeIfAbsent(destination, value -> new PriorityNode<>(value));
+        var edges = edgesMap.computeIfAbsent(sourcePriorityNode, (key) -> new ArrayList<>());
+        edges.add(new PriorityEdge<T>(sourcePriorityNode, destinationPriorityNode, weight));
     }
 
-    public Map<T, Integer> findShortestPath(T source) {
-        var map = new HashMap<T, PriorityNode>();
-        var pq = new ArrayList<PriorityNode<T>>();
+    public ShortestPathResult<T> findShortestPath(T source) {
+        var pq = new PriorityQueue<>(Comparator.comparingInt((PriorityNode<T> a) -> a.priority));
         var weights = new HashMap<T, Integer>();
         var parents = new HashMap<T, T>();
-        var dq = new HashSet<T>();
-        for (var node : edgesMap.keySet() ) {
-            var priority = source == node ? 0 : Integer.MAX_VALUE;
-            var priorityNode = new PriorityNode<T>(node, priority);
-            map.put(node, priorityNode);
-            pq.add(priorityNode);
-        }
+        var sourcePriorityNode = map.get(source);
+        for (var node : edgesMap.keySet()) {
+            node.priority = Integer.MAX_VALUE;
+            node.dequeued = false;
+        };
+        sourcePriorityNode.priority = 0;
+        pq.addAll(edgesMap.keySet());
 
         weights.put(source, 0);
         parents.put(source, null);
         while (!pq.isEmpty()) {
-            pq.sort(Comparator.comparingInt((PriorityNode<T> a) -> a.priority));
-            var currentPriorityNode = pq.remove(0);
+            var currentPriorityNode = pq.poll();
+            currentPriorityNode.dequeued = true;
             var current = currentPriorityNode.node;
-            var weight = currentPriorityNode.priority;
-            dq.add(current);
+            var currentWeight = currentPriorityNode.priority;
 
-            // update shortest dist of current vertex from source
-            weights.put(current, weight);
+            // update the shortest dist of current vertex from source
+            weights.put(current, currentWeight);
 
-            for (var edge : edgesMap.get(current)) {
-                T adj = (edge.source == current) ? edge.destination : edge.source;
+            for (var edge : edgesMap.get(currentPriorityNode)) {
+                PriorityNode<T> adj = (edge.source.node == current) ? edge.destination : edge.source;
 
-                // skip already dequeued vertices. O(1)
-                if (dq.contains(adj))
+                // skip already dequeued vertices.
+                if (adj.dequeued)
                 {
                     continue;
                 }
 
-                int calcWeight = weights.get(current) + edge.weight;
+                int calcWeight = currentWeight + edge.weight;
 
-                var adjNode = map.get(adj);
-                int adjWeight = adjNode.priority;
-
-                if (calcWeight < adjWeight)
+                if (calcWeight < adj.priority)
                 {
                     // relax
-                    map.get(adj).priority = calcWeight;
-                    // potentially O(n)
-                    pq.stream().filter(n -> n == adjNode).forEach(n -> n.priority = calcWeight);
+                    adj.priority = calcWeight;
 
-                    parents.put(adj, current);
+                    // reorder the node that just changed priority
+                    pq.remove(adj);
+                    pq.offer(adj);
+
+                    parents.put(adj.node, current);
                 }
 
             }
         }
-        return weights;
+        return new ShortestPathResult<T>(source, weights, parents);
     }
 
-    private final Map<T, List<Edge<T>>> edgesMap = new HashMap<>();
+    private final Map<PriorityNode<T>, List<PriorityEdge<T>>> edgesMap = new HashMap<>();
 
-    private class PriorityNode<T> {
+    private static class PriorityNode<T> {
         private final T node;
-        private int priority;
+        private int priority = Integer.MAX_VALUE;
 
-        public PriorityNode(T node, int priority) {
+        private boolean dequeued;
+
+        public PriorityNode(T node) {
             this.node = node;
-            this.priority = priority;
         }
     }
 
-    public record Edge<T>(T source, T destination, int weight) { }
+    private record PriorityEdge<T>(PriorityNode<T> source, PriorityNode<T> destination, int weight) { }
+
+    public record ShortestPathResult<T>(T source, Map<T, Integer> weights, Map<T, T> parents) { }
 }
 

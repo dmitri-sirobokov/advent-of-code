@@ -14,7 +14,25 @@ public class Day12 {
         var graph = readGraph(input);
         var paths = graph.findShortestPath(graph.start);
 
-        return paths.get(graph.end);
+//        ======  to print the path ======
+//        var visits = new boolean[input.size()][input.get(0).length()];
+//        var endNode = graph.end;
+//        while (endNode != null) {
+//            visits[endNode.position.y][endNode.position.x] = true;
+//            endNode = paths.parents().get(endNode);
+//        }
+//        for (var y = 0; y < input.size(); y++) {
+//            for (var x = 0; x < input.get(y).length(); x++) {
+//                var c = input.get(y).charAt(x);
+//                if (visits[y][x]) {
+//                    System.out.print("[" + c + "]");
+//                } else {
+//                    System.out.print(" " + c + " ");
+//                }
+//            }
+//            System.out.println();
+//        }
+        return paths.weights().get(graph.end);
     }
 
     public static long part2(List<String> input) {
@@ -22,7 +40,7 @@ public class Day12 {
         var results = new ArrayList<Integer>();
         for (var startNode : graph.starts) {
             var paths = graph.findShortestPath(startNode);
-            results.add(paths.get(graph.end));
+            results.add(paths.weights().get(graph.end));
         }
         return results.stream().mapToInt(Integer::intValue).min().orElse(0);
     }
