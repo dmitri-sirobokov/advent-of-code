@@ -44,7 +44,6 @@ public class Day11 {
 
             var operation = switch (lineParts[1]) {
                 case "+" -> Operation.ADD;
-                case "*" -> Operation.MUL;
                 default -> Operation.MUL;
             };
 

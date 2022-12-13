@@ -20,7 +20,7 @@ public class Day16 extends CodeBase {
         var binaryStringReader = new BinaryStringReader(binaryStringBuilder);
         var packet = readPacket(binaryStringReader);
 
-        return packetVersion + packetTypeId;
+        return 0;
     }
 
     private static Packet readPacket(BinaryStringReader binaryStringReader) {
@@ -38,6 +38,7 @@ public class Day16 extends CodeBase {
 
             }
         }
+        return null;
     }
 
     private static long readLiteral(BinaryStringReader binaryStringReader) {

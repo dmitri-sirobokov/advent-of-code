@@ -1,6 +1,7 @@
 package dms.adventofcode.y2021;
 
 import dms.adventofcode.TestInput;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Day 16: Packet Decoder
  */
+@Disabled("Under construction")
 class Day16Test {
 
     @ParameterizedTest

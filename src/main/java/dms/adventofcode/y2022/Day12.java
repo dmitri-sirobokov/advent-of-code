@@ -14,7 +14,7 @@ public class Day12 extends CodeBase {
     @SuppressWarnings("CommentedOutCode")
     public static long part1(List<String> input) {
         var graph = readGraph(input);
-        var paths = graph.findShortestPath(graph.start);
+        var paths = graph.findShortestPath(graph.end);
 
 //        ======  to print the path ======
 //        var visits = new boolean[input.size()][input.get(0).length()];
@@ -34,15 +34,15 @@ public class Day12 extends CodeBase {
 //            }
 //            System.out.println();
 //        }
-        return paths.weights().get(graph.end);
+        return paths.weights().get(graph.start);
     }
 
     public static long part2(List<String> input) {
         var graph = readGraph(input);
         var results = new ArrayList<Integer>();
+        var paths = graph.findShortestPath(graph.end);
         for (var startNode : graph.starts) {
-            var paths = graph.findShortestPath(startNode);
-            results.add(paths.weights().get(graph.end));
+            results.add(paths.weights().get(startNode));
         }
         return results.stream().mapToInt(Integer::intValue).min().orElse(0);
     }
@@ -80,7 +80,7 @@ public class Day12 extends CodeBase {
         }
 
         forEachAdjacent(nodes, (source, dest) -> {
-            int weight = dest.height - source.height > 1 ? 1000000 : 1;
+            int weight = source.height - dest.height > 1 ? 1000000 : 1;
             graph.addEdge(source, dest, weight);
         });
         return graph;
