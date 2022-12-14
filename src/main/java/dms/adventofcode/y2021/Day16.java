@@ -2,13 +2,12 @@ package dms.adventofcode.y2021;
 
 import dms.adventofcode.CodeBase;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Day16 extends CodeBase {
 
-    public static long part1(List<String> input) throws IOException {
+    public static long part1(List<String> input) {
 
         Packet packet = readPacket(input);
 
@@ -36,14 +35,14 @@ public class Day16 extends CodeBase {
 
         if (packet instanceof OperatorPacket op) {
             return switch (Long.valueOf(op.packetTypeId).intValue()) {
-                case 0 -> op.subPackets.stream().mapToLong(p -> calcValue(p)).sum();
-                case 1 -> op.subPackets.stream().mapToLong(p -> calcValue(p)).reduce((a,b) -> a * b).orElse(0);
-                case 2 -> op.subPackets.stream().mapToLong(p -> calcValue(p)).min().orElse(0);
-                case 3 -> op.subPackets.stream().mapToLong(p -> calcValue(p)).max().orElse(0);
+                case 0 -> op.subPackets.stream().mapToLong(Day16::calcValue).sum();
+                case 1 -> op.subPackets.stream().mapToLong(Day16::calcValue).reduce((a, b) -> a * b).orElse(0);
+                case 2 -> op.subPackets.stream().mapToLong(Day16::calcValue).min().orElse(0);
+                case 3 -> op.subPackets.stream().mapToLong(Day16::calcValue).max().orElse(0);
                 case 5 -> (calcValue(op.subPackets.get(0)) > calcValue(op.subPackets.get(1))) ? 1L : 0L;
                 case 6 -> (calcValue(op.subPackets.get(0)) < calcValue(op.subPackets.get(1))) ? 1L : 0L;
                 case 7 -> (calcValue(op.subPackets.get(0)) == calcValue(op.subPackets.get(1))) ? 1L : 0L;
-                default -> throw new IllegalStateException("Unexpected value: " + Long.valueOf(op.packetTypeId));
+                default -> throw new IllegalStateException("Unexpected value: " + op.packetTypeId);
             };
         }
         return 0;

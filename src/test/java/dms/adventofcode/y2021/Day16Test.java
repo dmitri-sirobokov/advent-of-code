@@ -3,7 +3,6 @@ package dms.adventofcode.y2021;
 import dms.adventofcode.TestInput;
 import org.junit.jupiter.params.ParameterizedTest;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +21,7 @@ class Day16Test {
     @TestInput(input = "y2021/day16_sample6.txt", expected = "23")
     @TestInput(input = "y2021/day16_sample7.txt", expected = "31")
     @TestInput(input = "y2021/day16.txt", expected = "938")
-    void part1(List<String> input, long expected) throws IOException {
+    void part1(List<String> input, long expected) {
         var result = Day16.part1(input);
         assertEquals(expected, result);
     }
@@ -33,8 +32,8 @@ class Day16Test {
     @TestInput(input = "y2021/day16_sample10.txt", expected = "7")
     @TestInput(input = "y2021/day16_sample11.txt", expected = "9")
     @TestInput(input = "y2021/day16_sample12.txt", expected = "1")
-    @TestInput(input = "y2021/day16_sample13.txt", expected = "0")
-    @TestInput(input = "y2021/day16_sample14.txt", expected = "0")
+    @TestInput(input = "y2021/day16_sample13.txt")
+    @TestInput(input = "y2021/day16_sample14.txt")
     @TestInput(input = "y2021/day16_sample15.txt", expected = "1")
     @TestInput(input = "y2021/day16.txt", expected = "1495959086337")
     void part2(List<String> input, long expected) {
