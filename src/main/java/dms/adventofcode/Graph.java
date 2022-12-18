@@ -5,6 +5,10 @@ import java.util.*;
 public class Graph<T> {
 
     private final HashMap<T, PriorityNode<T>> map = new HashMap<>();
+    private final Map<PriorityNode<T>, List<PriorityEdge<T>>> edgesMap = new HashMap<>();
+
+    private final EdgeWeightFunction<T> edgeWeightFunction;
+
 
     public void addEdge(T source, T destination, int weight) {
         var sourcePriorityNode = map.computeIfAbsent(source, PriorityNode::new);
@@ -45,7 +49,8 @@ public class Graph<T> {
                     continue;
                 }
 
-                int calcWeight = currentWeight + edge.weight;
+                var edgeWeight = this.edgeWeightFunction == null ? edge.weight : edgeWeightFunction.apply(edge.source.node, edge.destination.node);
+                int calcWeight = currentWeight + edgeWeight;
 
                 if (calcWeight < adj.priority)
                 {
@@ -64,7 +69,22 @@ public class Graph<T> {
         return new ShortestPathResult<>(source, weights, parents);
     }
 
-    private final Map<PriorityNode<T>, List<PriorityEdge<T>>> edgesMap = new HashMap<>();
+    public Graph() {
+        edgeWeightFunction = null;
+    }
+
+    public Graph(EdgeWeightFunction<T> edgeWeightFunction) {
+        this.edgeWeightFunction = edgeWeightFunction;
+    }
+
+    public Collection<T> getNodes() {
+        return map.keySet();
+    }
+
+    public void clear() {
+        this.map.clear();
+        this.edgesMap.clear();
+    }
 
     private static class PriorityNode<T> {
         private final T node;
@@ -80,5 +100,9 @@ public class Graph<T> {
     private record PriorityEdge<T>(PriorityNode<T> source, PriorityNode<T> destination, int weight) { }
 
     public record ShortestPathResult<T>(T source, Map<T, Integer> weights, Map<T, T> parents) { }
+
+    public interface EdgeWeightFunction<T> {
+        int apply(T source, T target);
+    }
 }
 
