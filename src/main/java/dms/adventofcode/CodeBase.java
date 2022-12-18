@@ -1,11 +1,31 @@
 package dms.adventofcode;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
 public class CodeBase {
 
     public CodeBase() { }
+
+    protected static List<String> readResourceFile(String resourcePath) throws IOException {
+        try (var resourceStream = CodeBase.class.getClassLoader().getResourceAsStream(resourcePath)) {
+            return readLines(IOUtils.toString(Objects.requireNonNull(resourceStream), StandardCharsets.UTF_8));
+        }
+    }
+
+    private static List<String> readLines(String input) throws IOException {
+        try (var br = new BufferedReader(new StringReader(input))) {
+            return br.lines().toList();
+        }
+    }
+
 
     /** Read text lines into a matrix with numeric values where each value represents a digit from 0 to 9.
      * Example input:
