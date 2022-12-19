@@ -5,7 +5,7 @@ import dms.adventofcode.CodeBase;
 import java.util.List;
 
 /**
- * Day 17: Pyroclastic Flow
+ * Day 18: Boiling Boulders
  */
 public class Day18 extends CodeBase {
 
