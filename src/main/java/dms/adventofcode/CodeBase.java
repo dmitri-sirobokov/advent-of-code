@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CodeBase {
 
@@ -109,6 +111,10 @@ public class CodeBase {
             }
         }
         return result;
+    }
+
+    protected static void printArray(int[] array) {
+        System.out.println("[" + Arrays.stream(array).mapToObj(Integer::toString).collect(Collectors.joining(",")) + "]");
     }
 
     protected static <T> T[][] mapArray(int[][] array, MapArrayFunction<T, Integer> func) {
