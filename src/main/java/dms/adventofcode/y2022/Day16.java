@@ -100,9 +100,9 @@ public class Day16 extends CodeBase {
             var targetValve = graph.valves.get(i);
             sourceValve.waitTime = 1;
             graph.valves.get(0).waitTime = 0;
-            var paths = graph.findShortestPath(sourceValve);
-            var distance = paths.weights().get(targetValve);
-            if (distance != null) {
+            var path = graph.findShortestPath(sourceValve, targetValve);
+            if (path != null) {
+                var distance = path.size() - 1;
                 targetValve.timeOpen = sourceValve.timeOpen + distance;
                 if (targetValve.timeOpen > maxTime) {
                     targetValve.timeOpen = maxTime;
@@ -186,12 +186,12 @@ public class Day16 extends CodeBase {
             var leadsTo = leadsToTempMap.get(sourceValve.name);
             for (var targetValveName : leadsTo) {
                 var targetValve = graph.map.get(targetValveName);
-                sourceValve.edges.add(targetValve);
+                sourceValve.neighbours.add(targetValve);
             }
         }
 
         for (var sourceValve : graph.valves) {
-            for (var targetValve : sourceValve.edges) {
+            for (var targetValve : sourceValve.neighbours) {
                 // initially we spend 1 minute to open the valve, and one minute to move to the next valve
                 // unless the valve is already open or damaged
                 graph.addEdge(sourceValve, targetValve, 1);
@@ -228,7 +228,7 @@ public class Day16 extends CodeBase {
         private final String name;
         private final int rate;
 
-        private final List<Valve> edges = new ArrayList<>();
+        private final List<Valve> neighbours = new ArrayList<>();
 
         private int pressureReleased;
 
