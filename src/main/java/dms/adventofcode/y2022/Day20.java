@@ -25,7 +25,6 @@ public class Day20 extends CodeBase {
             initialList[i] = new Number(decryptionKey * Integer.parseInt(input.get(i)), i);
         }
 
-        // clone initial list (is there a better way to do it in java?)
         var resultList = Arrays.copyOf(initialList, initialList.length);
 
         for (var k = 0; k < iterations; k++) {
