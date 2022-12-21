@@ -6,6 +6,7 @@ import dms.adventofcode.Graph;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Day 16: Proboscidea Volcanium
@@ -17,110 +18,20 @@ public class Day16 extends CodeBase {
 
         var graph = readValves(input);
 
-        var maxTime = 30;
-        var bestPath = new ArrayList<>(graph.valves);
-        var maxPressure = calcPressureReleased(graph, maxTime);
-        printPath(graph, maxTime);
-
-        // we try all paths through all combinations (permutations) of possible open valves
-        // normally, if we test all permutations, then we run to performance issues, as number of permutations
-        // is very large f(n!), where n is number of valves that can be open,
-        // but we can skip all smaller permutations at the right of the path when we know that they won't add up to max pressure
-        var permutationsIndex = new int[graph.valves.size()];
-        var valveNames = graph.valves.stream().map(v -> v.name).toList();
-
-        while (permutationsIndex[0] == 0) {
-            var permutList = new ArrayList<>(valveNames);
-            // next permutations
-            var newValveList = new ArrayList<Valve>();
-            for (var permutationIndex = 0; permutationIndex < permutationsIndex.length; permutationIndex++) {
-                var name = permutList.remove(permutationsIndex[permutationIndex]);
-                var valve = graph.map.get(name);
-                newValveList.add(valve);
-            }
-
-            graph.valves.clear();
-            graph.valves.addAll(newValveList);
-
-            var newPressure = calcPressureReleased(graph, maxTime);
-            if (newPressure > maxPressure) {
-                maxPressure = newPressure;
-                bestPath.clear();
-                bestPath.addAll(graph.valves);
-                printPath(graph, maxTime);
-            }
-
-            // approximate next permutation
-            var approximated = false;
-            var currentPressure = 0;
-            for (var i = 1; i < graph.valves.size(); i++) {
-                var prevValve = graph.valves.get(i - 1);
-                var remainingTime = maxTime - prevValve.timeOpen - 2;
-                if (remainingTime < 0) {
-                    remainingTime = 0;
-                }
-                currentPressure += prevValve.rate * remainingTime;
-                var maxRemainingPressure = 0;
-                for (var j = i; j < graph.valves.size(); j++) {
-                    var remainingValve = graph.valves.get(j);
-                    maxRemainingPressure += remainingTime * remainingValve.rate;
-                }
-                if (maxRemainingPressure + currentPressure < maxPressure) {
-                    permutationsIndex[i]++;
-                    for (var j = i + 1; j < permutationsIndex.length; j++) {
-                        permutationsIndex[j] = 0;
-                    }
-                    approximated = true;
-                    break;
-                }
-            }
-            if (!approximated) {
-                permutationsIndex[permutationsIndex.length - 1]++;
-            }
-            for (var permutationIndex = permutationsIndex.length - 1; permutationIndex >= 0; permutationIndex--) {
-                if (permutationsIndex[permutationIndex] > permutationsIndex.length - permutationIndex - 1) {
-                    permutationsIndex[permutationIndex] = 0;
-                    permutationsIndex[permutationIndex - 1]++;
-                }
-            }
-
-        }
-
-        graph.valves.clear();
-        graph.valves.addAll(bestPath);
-        var result =  calcPressureReleased(graph, maxTime);
-        printPath(graph, maxTime);
-        return result;
+        var path = new ArrayList<Valve>();
+        var openValves = new HashMap<Valve, Integer>();
+        path.add(graph.startValve);
+        var newPressure = calcPressureReleased(graph, 0, path, openValves);
+        printPath(path, newPressure);
+        return newPressure;
     }
 
-    private static void calculatePathLength(ValveGraph graph, int maxTime) {
-        for (var i = 1; i < graph.valves.size(); i++) {
-            graph.valves.forEach(valve -> valve.waitTime = 0);
-            var sourceValve = graph.valves.get(i - 1);
-            var targetValve = graph.valves.get(i);
-            sourceValve.waitTime = 1;
-            graph.valves.get(0).waitTime = 0;
-            var path = graph.findShortestPath(sourceValve, targetValve);
-            if (path != null) {
-                var distance = path.size() - 1;
-                targetValve.timeOpen = sourceValve.timeOpen + distance;
-                if (targetValve.timeOpen > maxTime) {
-                    targetValve.timeOpen = maxTime;
-                }
-            }
-        }
-    }
-
-    private static void printPath(ValveGraph graph, int maxTime) {
+    private static void printPath(List<Valve> path, int pressureReleased) {
         var string = new StringBuilder();
-        string.append(String.join("->", graph.valves.stream().map(valve -> valve.name).toList()));
+        string.append(String.join("->", path.stream().map(valve -> valve.name).toList()));
         string.append("=");
 
-        // print minutes
-        string.append(String.join(",", graph.valves.stream().map(valve -> Integer.valueOf(valve.timeOpen + 1).toString()).toList()));
-
-        string.append("=");
-        string.append(countPressureReleased(graph, maxTime));
+        string.append(pressureReleased);
 
         System.out.println(string);
     }
@@ -128,34 +39,37 @@ public class Day16 extends CodeBase {
     /**
      * Calculate total pressure release given the opening sequence of the valves and within a time we have.
      */
-    private static int calcPressureReleased(ValveGraph graph, int maxTime) {
-        calculatePathLength(graph, maxTime);
-        return countPressureReleased(graph, maxTime);
-    }
+    private static int calcPressureReleased(ValveGraph graph, int minutesElapsed, List<Valve> path, Map<Valve, Integer> openValves) {
+        var timeLimit = 30;
+        var maximumPressure = 0;
+        var currentValve = path.get(path.size() - 1);
+        if (minutesElapsed >= timeLimit || path.size() == graph.valvesToOpen.size() + 1) {
+            var pressureReleased = 0;
 
-    private static int countPressureReleased(ValveGraph graph, int maxTime) {
-        var result = 0;
-        for (var valve : graph.valves) {
-            var totTimeOpen = maxTime - valve.timeOpen - 1;
-            if (totTimeOpen < 0) {
-                totTimeOpen = 0;
+            for (var openValveKeyValue : openValves.entrySet()) {
+                var minutesOpened = Math.max(timeLimit - openValveKeyValue.getValue(), 0);
+                pressureReleased += openValveKeyValue.getKey().rate * minutesOpened;
             }
-            result += valve.rate * totTimeOpen;
+           return pressureReleased;
+        } else {
+            for (var nextValve : graph.valvesToOpen) {
+                if (!openValves.containsKey(nextValve)) {
+                    var travelTime = graph.findShortestPath(currentValve, nextValve).size() - 1;
+                    var newMinutesElapsed = minutesElapsed + travelTime + 1;
+
+                    var newOpenValves = new HashMap<>(openValves);
+                    newOpenValves.put(nextValve, newMinutesElapsed);
+
+                    var newPath = new ArrayList<>(path);
+                    newPath.add(nextValve);
+
+                    maximumPressure = Math.max(maximumPressure, calcPressureReleased(graph, newMinutesElapsed, newPath, newOpenValves));
+                }
+            }
         }
-        return result;
+        return maximumPressure;
     }
 
-    //    private static List<List<Valve>> visitAllPaths(Valve start) {
-//        var path = new ArrayList<Valve>();
-//        path.add(start);
-//
-//            for (var target: start.edges) {
-//                var listvisitAllPaths(target);
-//            }
-//
-//        return result;
-//    }
-//
     public static long part2(List<String> input) {
         return 0;
     }
@@ -177,12 +91,12 @@ public class Day16 extends CodeBase {
             }
             var valve = new Valve(valveName, valveRate);
             valve.waitTime = 0;
-            graph.valves.add(valve);
+            graph.valvesToOpen.add(valve);
             graph.map.put(valve.name, valve);
             leadsToTempMap.put(valveName, targetValveNames);
         }
 
-        for (var sourceValve : graph.valves) {
+        for (var sourceValve : graph.valvesToOpen) {
             var leadsTo = leadsToTempMap.get(sourceValve.name);
             for (var targetValveName : leadsTo) {
                 var targetValve = graph.map.get(targetValveName);
@@ -190,7 +104,7 @@ public class Day16 extends CodeBase {
             }
         }
 
-        for (var sourceValve : graph.valves) {
+        for (var sourceValve : graph.valvesToOpen) {
             for (var targetValve : sourceValve.neighbours) {
                 // initially we spend 1 minute to open the valve, and one minute to move to the next valve
                 // unless the valve is already open or damaged
@@ -198,9 +112,8 @@ public class Day16 extends CodeBase {
             }
         }
 
-        var startValve = graph.valves.get(0);
-        graph.valves.removeIf(v -> v.rate == 0);
-        graph.valves.add(0, startValve);
+        graph.startValve = graph.map.get("AA");
+        graph.valvesToOpen.removeIf(v -> v.rate == 0);
 
         return graph;
     }
@@ -214,10 +127,11 @@ public class Day16 extends CodeBase {
 
         // the list of all valves in the order of their openings,
         // we are going to sort this list to produce maximum release of pressure.
-        public List<Valve> valves = new ArrayList<>();
+        public final List<Valve> valvesToOpen = new ArrayList<>();
 
         // Dictionary of valves, to quickly find a valve by name.
-        public HashMap<String, Valve> map = new HashMap<>();
+        public final HashMap<String, Valve> map = new HashMap<>();
+        public Valve startValve;
 
         public ValveGraph() {
             super((a, b) -> a.waitTime + 1); // valve opening time + time to go to another valve
@@ -242,4 +156,5 @@ public class Day16 extends CodeBase {
             this.rate = rate;
         }
     }
+
 }

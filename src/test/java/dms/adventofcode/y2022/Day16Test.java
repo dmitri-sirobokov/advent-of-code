@@ -13,7 +13,7 @@ class Day16Test {
 
     @ParameterizedTest
     @TestInput(input = "y2022/day16_sample.txt", expected = "1651")
-    @TestInput(input = "y2022/day16.txt", expected = "1")
+    @TestInput(input = "y2022/day16.txt", expected = "1940")
     void part1(List<String> input, long expected) {
         var result = Day16.part1(input);
 
@@ -21,7 +21,7 @@ class Day16Test {
     }
 
     @ParameterizedTest
-    @TestInput(input = "y2022/day16_sample.txt", expected = "1") // first guess 1742, too low
+    @TestInput(input = "y2022/day16_sample.txt", expected = "1707")
     @TestInput(input = "y2022/day16.txt", expected = "1")
     void part2(List<String> input, long expected) {
         var result = Day16.part2(input);

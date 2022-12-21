@@ -35,7 +35,6 @@ public class Graph<T> {
 
         var visited = new HashSet<T>();
 
-        queue.add(path);
         while (!queue.isEmpty()) {
             path = queue.pop();
             var node = path.get(path.size() - 1);
