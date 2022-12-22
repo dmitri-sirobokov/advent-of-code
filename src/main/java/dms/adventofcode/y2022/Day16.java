@@ -26,6 +26,11 @@ public class Day16 extends CodeBase {
         return newPressure;
     }
 
+    public static long part2(List<String> input) {
+        return 0;
+    }
+
+
     private static void printPath(List<Valve> path, int pressureReleased) {
         var string = new StringBuilder();
         string.append(String.join("->", path.stream().map(valve -> valve.name).toList()));
@@ -68,10 +73,6 @@ public class Day16 extends CodeBase {
             }
         }
         return maximumPressure;
-    }
-
-    public static long part2(List<String> input) {
-        return 0;
     }
 
     private static ValveGraph readValves(List<String> input) {
