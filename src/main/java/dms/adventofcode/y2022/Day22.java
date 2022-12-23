@@ -2,9 +2,7 @@ package dms.adventofcode.y2022;
 
 import dms.adventofcode.CodeBase;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Day 22: Monkey Map
@@ -303,29 +301,29 @@ public class Day22 extends CodeBase {
 
                 // transform coordinates from one cube face to another
                 // todo: we should use a transform matrix for that, instead of giant switch
-                var x1 = mapData.cube.x;
-                var y1 = mapData.cube.y;
+                var x1 = edge.dest.x;
+                var y1 = edge.dest.y;
                 switch (mapData.cube.dir) {
                     case 0: switch (edge.dir) {
                         // from right to right
                         case 0 -> {
-                            x1 = edge.dest.x;
-                            y1 = edge.dest.y + (mapData.cube.y - edge.source.y);
+                            x1 += 0;
+                            y1 += mapData.cube.y - edge.source.y;
                         }
                         // from right to down
                         case 1 -> {
-                            x1 = edge.dest.x + mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
-                            y1 = edge.dest.y;
+                            x1 += mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
+                            y1 += 0;
                         }
                         // from right to left
                         case 2 -> {
-                            x1 = edge.dest.x + mapData.cube.size - 1;
-                            y1 = edge.dest.y + mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
+                            x1 += mapData.cube.size - 1;
+                            y1 += mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
                         }
                         // from right to up
                         case 3 -> {
-                            x1 = edge.dest.x + mapData.cube.y - edge.source.y;
-                            y1 = edge.dest.y + mapData.cube.size - 1;
+                            x1 += mapData.cube.y - edge.source.y;
+                            y1 += mapData.cube.size - 1;
                         }
 
                     }
@@ -334,23 +332,23 @@ public class Day22 extends CodeBase {
                     case 1: switch (edge.dir) {
                         // from down to right
                         case 0 -> {
-                            x1 = edge.dest.x;
-                            y1 = edge.dest.y + mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
+                            x1 += 0;
+                            y1 += mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
                         }
                         // from down to down
                         case 1 -> {
-                            x1 = edge.dest.x + (mapData.cube.x - edge.source.x);
-                            y1 = edge.dest.y;
+                            x1 += (mapData.cube.x - edge.source.x);
+                            y1 += 0;
                         }
                         // from down to left
                         case 2 -> {
-                            x1 = edge.dest.x + mapData.cube.size - 1;
-                            y1 = edge.dest.y + (mapData.cube.x - edge.source.x);
+                            x1 += mapData.cube.size - 1;
+                            y1 += (mapData.cube.x - edge.source.x);
                         }
                         // from down to up
                         case 3 -> {
-                            x1 = edge.dest.x + mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
-                            y1 = edge.dest.y + mapData.cube.size - 1;
+                            x1 += mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
+                            y1 += mapData.cube.size - 1;
                         }
                     }
                     break;
@@ -358,23 +356,23 @@ public class Day22 extends CodeBase {
                     case 2: switch (edge.dir) {
                         // from left to right
                         case 0 -> {
-                            x1 = edge.dest.x;
-                            y1 = edge.dest.y + mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
+                            x1 += 0;
+                            y1 += mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
                         }
                         // from left to down
                         case 1 -> {
-                            x1 = edge.dest.x + (mapData.cube.y - edge.source.y);
-                            y1 = edge.dest.y;
+                            x1 += mapData.cube.y - edge.source.y;
+                            y1 += 0;
                         }
                         // from left to left
                         case 2 -> {
-                            x1 = edge.dest.x + mapData.cube.size - 1;
-                            y1 = edge.dest.y + (mapData.cube.y - edge.source.y);
+                            x1 += mapData.cube.size - 1;
+                            y1 += mapData.cube.y - edge.source.y;
                         }
                         // from left to up
                         case 3 -> {
-                            x1 = edge.dest.x + mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
-                            y1 = edge.dest.y + mapData.cube.size - 1;
+                            x1 += mapData.cube.size - (mapData.cube.y - edge.source.y) - 1;
+                            y1 += mapData.cube.size - 1;
                         }
                     }
                     break;
@@ -382,23 +380,23 @@ public class Day22 extends CodeBase {
                     case 3: switch (edge.dir) {
                         // from up to right
                         case 0 -> {
-                            x1 = edge.dest.x;
-                            y1 = edge.dest.y + mapData.cube.x - edge.source.x;
+                            x1 += 0;
+                            y1 += mapData.cube.x - edge.source.x;
                         }
                         // from up to down
                         case 1 -> {
-                            x1 = edge.dest.x + mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
-                            y1 = edge.dest.y;
+                            x1 += mapData.cube.size - (mapData.cube.x - edge.source.x) - 1;
+                            y1 += 0;
                         }
                         // from up to left
                         case 2 -> {
-                            x1 = edge.dest.x + mapData.cube.size - 1;
-                            y1 = edge.dest.y + mapData.cube.size - 1 - (mapData.cube.x - edge.source.x);
+                            x1 += mapData.cube.size - 1;
+                            y1 += mapData.cube.size - 1 - (mapData.cube.x - edge.source.x);
                         }
                         // from up to up
                         case 3 -> {
-                            x1 = edge.dest.x + (mapData.cube.x - edge.source.x);
-                            y1 = edge.dest.y + mapData.cube.size - 1;
+                            x1 += mapData.cube.x - edge.source.x;
+                            y1 += mapData.cube.size - 1;
                         }
                     }
                         break;
@@ -406,13 +404,6 @@ public class Day22 extends CodeBase {
                 mapData.cube.dir = edge.dir;
                 mapData.cube.x = x1;
                 mapData.cube.y = y1;
-
-                var key = "(" + edge.source.x + "," + edge.source.y + ")->(" + edge.dest.x + "," + edge.dest.y + "); " +
-                        "; dir " + prevDir + " -> " + mapData.cube.dir;
-                if (mapData.crossedEdges.add(key)) {
-                    System.out.println("Crossing the edge from face " + key
-                            + "; xy changed (" + prevx + "," + prevy + ") -> (" + mapData.cube.x + "," + mapData.cube.y + ")");
-                }
 
             }
 
@@ -458,9 +449,6 @@ public class Day22 extends CodeBase {
         // 6 faces of the cube
         private final Cube cube;
         private final String instructions;
-
-        // for debugging purpose
-        private final Set<String> crossedEdges = new HashSet<>();
 
         public MapData(Cube cube, String instructions) {
             this.instructions = instructions;
