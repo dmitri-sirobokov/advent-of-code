@@ -117,6 +117,15 @@ public class CodeBase {
         System.out.println("[" + Arrays.stream(array).mapToObj(Integer::toString).collect(Collectors.joining(",")) + "]");
     }
 
+    protected static void printMatrix(char[][] matrix) {
+        for (var y = 0; y < matrix.length; y++) {
+            for (var x = 0; x < matrix[y].length; x++) {
+                System.out.print(matrix[y][x]);
+            }
+            System.out.println();
+        }
+    }
+
     protected static <T> T[][] mapArray(int[][] array, MapArrayFunction<T, Integer> func) {
         return mapArray(array, (x, y, value) -> func.apply(value));
     }
