@@ -130,6 +130,19 @@ public class CodeBase {
         return mapArray(array, (x, y, value) -> func.apply(value));
     }
 
+    /**
+     * Calculate common greatest divisor for integers a and b. Can be useful to calculate a number of repetitions in various algorithms.
+     * See <a href="https://en.wikipedia.org/wiki/Euclidean_algorithm">Euclidean algorithm</a>
+     */
+    protected static int gcd(int a, int b) {
+        while (b != 0) {
+            var t = b;
+            b = a % b;
+            a = t;
+        }
+        return a;
+    }
+
     public interface MatrixForEachConsumer {
         void apply(int x, int y);
     }
@@ -145,4 +158,5 @@ public class CodeBase {
     public interface MapArrayFunctionXY<R, V> {
         R apply(int x, int y, V value);
     }
+
 }
