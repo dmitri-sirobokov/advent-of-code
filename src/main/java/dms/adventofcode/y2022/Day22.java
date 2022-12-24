@@ -56,18 +56,9 @@ public class Day22 extends CodeBase {
 
             }
             instructionCount++;
-            // printMap(mapData, instructionCount, instructionDisplayText);
         }
 
-        // printMap(mapData, instructionCount, "End");
-
         return 1000 * (mapData.cube.y + 1) + 4 * (mapData.cube.x + 1) + mapData.cube.dir;
-    }
-
-    private static void printMap(MapData mapData, int step, String instructionName) {
-        System.out.println("== After Instruction " + step + " (" + instructionName + "): ==");
-        printMatrix(mapData.cube.map);
-        System.out.println();
     }
 
     private static void part1SampleMapData(MapData mapData) {
@@ -408,9 +399,6 @@ public class Day22 extends CodeBase {
             }
 
             if (mapData.cube.map[mapData.cube.y][mapData.cube.x] == '#') {
-                if (edge != null) {
-                    System.out.println("Crossing the edge is blocked at position (" + mapData.cube.x + "," + mapData.cube.y + "). Rolling back coordinates.");
-                }
                 mapData.cube.x = prevx;
                 mapData.cube.y = prevy;
                 mapData.cube.dir = prevDir;

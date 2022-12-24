@@ -26,6 +26,7 @@ public class Day17 extends CodeBase {
         Chamber chamber = simulateChamber(input, 1000000000000L);
         return chamber.getHeight();
     }
+
     private static Chamber simulateChamber(List<String> input, long count) throws IOException {
         var rocksEngine = readRocks();
         var jetsEngine = readJets(input);
@@ -37,24 +38,13 @@ public class Day17 extends CodeBase {
         var iter2 = 0L;
         for (var i = 0L; i < count; i++) {
 
-//        // todo: in part2, pattern repeats every 1850 iterations, compute this get this value from the hash, instead hardcoded
-//        var count = 1000000000000L;
-//        var modulo = 1850;
-//        var moduloCount = count / modulo;
-//        count = count % modulo;
-//
-//        Chamber chamber = simulateChamber(input, modulo);
-//        var height1 = moduloCount * chamber.getHeight();
-//        chamber = simulateChamber(input, count);
-//        var height
-
             var rock = rocksEngine.getNext();
             var jetHash = jetsEngine.counter % jetsEngine.jets.length;
             var rockHash = rock.id;
             var heightsHash = chamber.calcHeightsHash();
 
-            var rockAndJetHash = "[" + rockHash + "," + jetHash +  "]";
-            var hash =  heightsHash + rockAndJetHash;
+            var rockAndJetHash = "[" + rockHash + "," + jetHash + "]";
+            var hash = heightsHash + rockAndJetHash;
             heightCache.putIfAbsent(hash, 0);
             var hashCounter = heightCache.compute(hash, (k, v) -> v + 1);
             if ((hashCounter >= 2 && hashCounter <= 5) && rockHash == 1) {
@@ -65,21 +55,17 @@ public class Day17 extends CodeBase {
                 if (height2 == 0 && hashCounter == 3) {
                     height2 = chamber.getHeight();
                     iter2 = rocksEngine.counter;
-                    var modulo = iter2 -iter1;
+                    var modulo = iter2 - iter1;
                     var times = count / modulo - 3;
 
                     i += times * modulo;
                     chamber.bufferHeight += times * (height2 - height1);
                 }
-                System.out.println(hash + "(" + hashCounter + ") -> Iteration " + rocksEngine.counter + " -> Height " + chamber.getHeight());
             }
 
             chamber.addRock(rock);
             while (chamber.process()) {
             }
-//            if (i < 10) {
-//                chamber.print(System.out);
-//            }
         }
         return chamber;
     }
@@ -143,7 +129,7 @@ public class Day17 extends CodeBase {
         }
 
         public JetDirection getNext() {
-            var result = this.jets[(int)(counter % this.jets.length)];
+            var result = this.jets[(int) (counter % this.jets.length)];
             counter++;
             return result;
         }
@@ -212,7 +198,7 @@ public class Day17 extends CodeBase {
         }
 
         private String calcHash() {
-            var rockAndJetHash = "[" + rockHash + "," + jetHash +  "]";
+            var rockAndJetHash = "[" + rockHash + "," + jetHash + "]";
             return heightsHash + rockAndJetHash;
         }
 
@@ -288,14 +274,14 @@ public class Day17 extends CodeBase {
 
         private String calcHeightsHash() {
             long[] heights = calcHeights();
-            return Arrays.stream(heights).mapToObj(v -> String.format("%3d", v)).reduce((a,b) -> a + "," + b).orElse("");
+            return Arrays.stream(heights).mapToObj(v -> String.format("%3d", v)).reduce((a, b) -> a + "," + b).orElse("");
         }
 
         private long[] calcHeights() {
             var heights = new long[width];
             for (var x = 0; x < width; x++) {
                 for (var y = height - 1; y >= 0; y--) {
-                    if (buffer[(int)y][x]) {
+                    if (buffer[(int) y][x]) {
                         heights[x] = height - y - 1;
                         break;
                     }

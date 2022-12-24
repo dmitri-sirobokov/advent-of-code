@@ -1,6 +1,7 @@
 package dms.adventofcode.y2022;
 
 import dms.adventofcode.TestInput;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled("Under construction")
 class Day19Test {
 
     @ParameterizedTest

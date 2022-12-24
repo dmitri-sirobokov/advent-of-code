@@ -14,11 +14,28 @@ public class Day24 extends CodeBase {
     public static long part1(List<String> input) {
         var blizzardsEngine = new BlizzardsEngine(input);
 
-        var step = 0;
+        return countSteps(blizzardsEngine, 0, 0, blizzardsEngine.sizeX - 1, blizzardsEngine.sizeY - 1, 0);
+    }
+
+    public static long part2(List<String> input) {
+        var blizzardsEngine = new BlizzardsEngine(input);
+
+        var startX = 0;
+        var startY = 0;
+        var endX = blizzardsEngine.sizeX - 1;
+        var endY = blizzardsEngine.sizeY - 1;
+
+        var steps1 = countSteps(blizzardsEngine, startX, startY, endX, endY, 0);
+        var steps2 = countSteps(blizzardsEngine, endX, endY, startX, startY, steps1 - 1);
+        return countSteps(blizzardsEngine, startX, startY, endX, endY, steps2 - 1);
+    }
+
+    private static int countSteps(BlizzardsEngine blizzardsEngine, int startX, int startY, int endX, int endY, int startingStep) {
+        var step = startingStep;
         var priorities = new int[blizzardsEngine.sizeY][blizzardsEngine.sizeX];
         Arrays.stream(priorities).forEach(p -> Arrays.fill(p, Integer.MAX_VALUE));
 
-        while (priorities[blizzardsEngine.sizeY - 1][blizzardsEngine.sizeX - 1] == Integer.MAX_VALUE) {
+        while (priorities[endY][endX] == Integer.MAX_VALUE) {
             step++;
             var blizzards = blizzardsEngine.renderStep(step);
 
@@ -26,8 +43,8 @@ public class Day24 extends CodeBase {
             Arrays.stream(newPriorities).forEach(p -> Arrays.fill(p, Integer.MAX_VALUE));
 
             // start point
-            if (blizzards[0][0] == 0) {
-                newPriorities[0][0] = Math.min(step, priorities[0][0]);
+            if (blizzards[startY][startX] == 0) {
+                newPriorities[startY][startX] = Math.min(step, priorities[startY][startX]);
             }
 
             for (var y = 0; y < blizzardsEngine.sizeY; y++) {
@@ -59,14 +76,10 @@ public class Day24 extends CodeBase {
         return step + 1;
     }
 
-    public static long part2(List<String> input) {
-        return 0;
-    }
-
     private static class Blizzard {
         private int x;
         private int y;
-        private char dir;
+        private final char dir;
 
         public Blizzard(int x, int y, char dir) {
             this.x = x;
@@ -108,8 +121,7 @@ public class Day24 extends CodeBase {
             // render new image
             while (maps.size() <= step) {
                 var map = new char[sizeY][sizeX];
-                for (var i = 0; i < blizzards.size(); i++) {
-                    var blizzard = blizzards.get(i);
+                for (Blizzard blizzard : blizzards) {
                     if (Character.isDigit(map[blizzard.y][blizzard.x])) {
                         map[blizzard.y][blizzard.x]++;
                     } else if (map[blizzard.y][blizzard.x] != 0) {
@@ -134,9 +146,6 @@ public class Day24 extends CodeBase {
 
             return maps.get(step);
         }
-    }
-
-    private record VisitNode(int mapId, int x, int y) {
     }
 
 }

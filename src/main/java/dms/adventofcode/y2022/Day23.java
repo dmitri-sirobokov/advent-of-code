@@ -58,28 +58,6 @@ public class Day23 extends CodeBase {
         return grove;
     }
 
-    // Code to print elfs positions
-    //    private static void printElfs(Grove grove) {
-    //        var minX = grove.elfs.stream().mapToInt(e -> e.x).min().orElse(0);
-    //        var maxX = grove.elfs.stream().mapToInt(e -> e.x).max().orElse(0);
-    //        var minY = grove.elfs.stream().mapToInt(e -> e.y).min().orElse(0);
-    //        var maxY = grove.elfs.stream().mapToInt(e -> e.y).max().orElse(0);
-    //
-    //        for (var y = 0; y <= maxY - minY; y++) {
-    //            System.out.print('.');
-    //            for (var x = 0; x <= maxX - minX; x++) {
-    //                if (grove.map[minY + y][minX + x] != null) {
-    //                    System.out.print('#');
-    //                } else {
-    //                    System.out.print('.');
-    //                }
-    //            }
-    //            System.out.print('.');
-    //            System.out.println();
-    //        }
-    //        System.out.println();
-    //    }
-
     private static Grove readInput(List<String> input) {
         var grove = new Grove();
         var o = grove.map.length / 2;
@@ -101,7 +79,7 @@ public class Day23 extends CodeBase {
         private final List<Elf> elfs = new ArrayList<>();
 
         // map buffer;
-        private final Elf[][] map = new Elf[400][400];;
+        private final Elf[][] map = new Elf[400][400];
         private final int[][] propositions = new int[400][400];
         public boolean isMoved;
         public long iteration;
