@@ -27,7 +27,17 @@ public class Day16 extends CodeBase {
     }
 
     public static long part2(List<String> input) {
-        return 0;
+        var graph = readValves(input);
+
+        var openValves = new HashMap<Valve, Integer>();
+        var pathMe = new ArrayList<Valve>();
+        pathMe.add(graph.startValve);
+        var pathElephant = new ArrayList<Valve>();
+        pathElephant.add(graph.startValve);
+        var newPressure = calcPressureReleased2(graph, 0, 0, pathMe, pathElephant, openValves);
+        printPath(pathMe, newPressure);
+        printPath(pathElephant, newPressure);
+        return newPressure;
     }
 
 
@@ -42,7 +52,7 @@ public class Day16 extends CodeBase {
     }
 
     /**
-     * Calculate total pressure release given the opening sequence of the valves and within a time we have.
+     * Part1: Calculate total pressure release given the opening sequence of the valves and within a time we have.
      */
     private static int calcPressureReleased(ValveGraph graph, int minutesElapsed, List<Valve> path, Map<Valve, Integer> openValves) {
         var timeLimit = 30;
@@ -59,7 +69,7 @@ public class Day16 extends CodeBase {
         } else {
             for (var nextValve : graph.valvesToOpen) {
                 if (!openValves.containsKey(nextValve)) {
-                    var travelTime = graph.findShortestPath(currentValve, nextValve).size() - 1;
+                    int travelTime = getTravelTimeCached(graph, currentValve, nextValve);
                     var newMinutesElapsed = minutesElapsed + travelTime + 1;
 
                     var newOpenValves = new HashMap<>(openValves);
@@ -69,6 +79,87 @@ public class Day16 extends CodeBase {
                     newPath.add(nextValve);
 
                     maximumPressure = Math.max(maximumPressure, calcPressureReleased(graph, newMinutesElapsed, newPath, newOpenValves));
+                }
+            }
+        }
+        return maximumPressure;
+    }
+
+    private static int getTravelTimeCached(ValveGraph graph, Valve currentValve, Valve nextValve) {
+        var shortestPathKey1 = currentValve.name + nextValve.name;
+        var shortestPathKey2 = nextValve.name + currentValve.name;
+        int travelTime;
+        if (graph.shortestPathsCache.containsKey(shortestPathKey1)) {
+            travelTime = graph.shortestPathsCache.get(shortestPathKey1);
+        } else if (graph.shortestPathsCache.containsKey(shortestPathKey2)) {
+            travelTime = graph.shortestPathsCache.get(shortestPathKey2);
+        } else {
+            travelTime = graph.findShortestPath(currentValve, nextValve).size() - 1;
+            graph.shortestPathsCache.put(currentValve.name + nextValve.name, travelTime);
+        }
+        return travelTime;
+    }
+
+    /**
+     * Part2: Calculate total pressure release given the opening sequence of the valves and within a time we have.
+     */
+    private static int calcPressureReleased2(ValveGraph graph, int minutesElapsedMe, int minutesElapsedElephant, List<Valve> pathMe, List<Valve> pathElephant, Map<Valve, Integer> openValves) {
+        var timeLimit = 26;
+        var maximumPressure = 0;
+        var currentValveMe = pathMe.get(pathMe.size() - 1);
+        var currentValveElephant = pathElephant.get(pathMe.size() - 1);
+        var maxRemainingTime = Math.max(0, timeLimit - Math.min(minutesElapsedMe, minutesElapsedElephant));
+        if (maxRemainingTime == 0 || pathMe.size() + pathElephant.size() >= graph.valvesToOpen.size() + 2) {
+            var pressureReleased = 0;
+
+            for (var openValveKeyValue : openValves.entrySet()) {
+                var minutesOpened = Math.max(timeLimit - openValveKeyValue.getValue(), 0);
+                pressureReleased += openValveKeyValue.getKey().rate * minutesOpened;
+            }
+            return pressureReleased;
+        } else {
+
+            var maxRemainingPressure = 0;
+            for (var i = 0; i < graph.valvesToOpen.size(); i++) {
+
+            }
+
+
+            for (var i = 0; i < graph.valvesToOpen.size(); i++) {
+                var nextValveMe = graph.valvesToOpen.get(i);
+                var travelTimeMe = getTravelTimeCached(graph, currentValveMe, nextValveMe);
+                var newMinutesElapsedMe = minutesElapsedMe + travelTimeMe + 1;
+                if (!openValves.containsKey(nextValveMe)) {
+                    for (var j = 0; j < graph.valvesToOpen.size(); j++) {
+                        var nextValveElephant = graph.valvesToOpen.get(j);
+                        if (!openValves.containsKey(nextValveElephant)) {
+
+                            var travelTimeElephant = getTravelTimeCached(graph, currentValveElephant, nextValveElephant);
+                            var newMinutesElapsedElephant = minutesElapsedElephant + travelTimeElephant + 1;
+
+                            var newOpenValves = new HashMap<>(openValves);
+                            if (newMinutesElapsedMe <= timeLimit) {
+                                newOpenValves.put(nextValveMe, newMinutesElapsedMe);
+                            }
+                            if (newMinutesElapsedElephant <= timeLimit) {
+                                newOpenValves.put(nextValveElephant, newMinutesElapsedElephant);
+                            }
+
+                            var newPathMe = new ArrayList<>(pathMe);
+                            newPathMe.add(nextValveMe);
+
+                            var newPathElephant = new ArrayList<>(pathElephant);
+                            newPathElephant.add(nextValveElephant);
+
+                            maximumPressure = Math.max(maximumPressure, calcPressureReleased2(graph, newMinutesElapsedMe, newMinutesElapsedElephant, newPathMe, newPathElephant, newOpenValves));
+                            if (newPathMe.size() < 4 && newPathElephant.size() < 4) {
+                                System.out.println("== New Path for Me and Elephant ==");
+                                printPath(newPathMe, maximumPressure);
+                                printPath(newPathElephant, maximumPressure);
+                                System.out.println();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -132,6 +223,8 @@ public class Day16 extends CodeBase {
 
         // Dictionary of valves, to quickly find a valve by name.
         public final HashMap<String, Valve> map = new HashMap<>();
+
+        public final HashMap<String, Integer> shortestPathsCache = new HashMap<>();
         public Valve startValve;
 
         public ValveGraph() {
