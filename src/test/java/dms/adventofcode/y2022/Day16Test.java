@@ -1,12 +1,14 @@
 package dms.adventofcode.y2022;
 
 import dms.adventofcode.TestInput;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Disabled("Disabled due to performance. Running > 30 sec")
 class Day16Test {
 
     @ParameterizedTest
@@ -20,12 +22,11 @@ class Day16Test {
 
     @ParameterizedTest
     @TestInput(input = "y2022/day16_sample.txt", expected = "1707")
-    @TestInput(input = "y2022/day16.txt", expected = "1")
+    @TestInput(input = "y2022/day16.txt", expected = "2469")
     void part2(List<String> input, long expected) {
         var result = Day16.part2(input);
 
         assertEquals(expected, result);
     }
-
 
 }
