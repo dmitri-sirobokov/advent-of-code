@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class Day19Test {
 
     @ParameterizedTest
-    @TestInput(input = "y2022/day19_sample.txt", expected = "1")
+    @TestInput(input = "y2022/day19_sample.txt", expected = "33")
     @TestInput(input = "y2022/day19.txt", expected = "1")
     void part1(List<String> input, long expected) throws IOException {
         var result = Day19.part1(input);
