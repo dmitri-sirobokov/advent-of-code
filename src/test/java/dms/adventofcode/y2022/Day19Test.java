@@ -9,12 +9,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("Under construction")
+@Disabled("Very slow test, and requires at least 16GB memory (can be improved)")
 class Day19Test {
 
     @ParameterizedTest
     @TestInput(input = "y2022/day19_sample.txt", expected = "33")
-    @TestInput(input = "y2022/day19.txt", expected = "1")
+    @TestInput(input = "y2022/day19.txt", expected = "1613")
     void part1(List<String> input, long expected) throws IOException {
         var result = Day19.part1(input);
 
@@ -22,8 +22,8 @@ class Day19Test {
     }
 
     @ParameterizedTest
-    @TestInput(input = "y2022/day19_sample.txt", expected = "1")
-    @TestInput(input = "y2022/day19.txt", expected = "1")
+    @TestInput(input = "y2022/day19_sample.txt", expected = "3472")
+    @TestInput(input = "y2022/day19.txt", expected = "46816")
     void part2(List<String> input, long expected) throws IOException {
         var result = Day19.part2(input);
 

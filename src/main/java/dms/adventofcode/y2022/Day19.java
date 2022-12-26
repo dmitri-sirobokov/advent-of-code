@@ -2,16 +2,14 @@ package dms.adventofcode.y2022;
 
 import dms.adventofcode.CodeBase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Day 19: Not Enough Minerals. Robots collecting minerals, find the way to collect most of the geodes.
  */
+// todo: improve required memory and speed for this puzzle (takes 5 min to complete and requires 16GB memory for the cache, Part 2)
 public class Day19 extends CodeBase {
 
     public static long part1(List<String> input) {
@@ -23,72 +21,119 @@ public class Day19 extends CodeBase {
             var bluePrint = bluePrints.get(i);
             var resources = new int[] { 0, 0, 0, 0 };
             var bots = new int[] { 1, 0, 0, 0 };
-            var geos = runBluePrintDfs(bluePrint, new HashMap<>(), 24, resources, bots);
+            var cache = new HashMap<String, Integer>();
+            var geos = runBluePrintDfs(bluePrint, cache, 24, resources, bots);
             total += (i + 1) * geos;
+            System.out.println("Blueprint " + (i + 1) + " score=" + geos + "; Calculated steps: " + bluePrint.stepCounts
+                    + "; Cache size: " + cache.size() + "; Cache hits: " + bluePrint.cacheHits);
         }
         return total;
     }
 
     public static long part2(List<String> input) {
-        return 0;
+        var bluePrints = readBluePrints(input);
+
+        var result = 1;
+
+        for (var i = 0; i < Math.min(3, bluePrints.size()); i++) {
+            var bluePrint = bluePrints.get(i);
+            var resources = new int[] { 0, 0, 0, 0 };
+            var bots = new int[] { 1, 0, 0, 0 };
+            var cache = new HashMap<String, Integer>();
+            var geos = runBluePrintDfs(bluePrint, cache, 32, resources, bots);
+            result *= geos;
+            System.out.println("Blueprint " + (i + 1) + " score=" + geos + "; Calculated steps: " + bluePrint.stepCounts
+                    + "; Cache size: " + cache.size() + "; Cache hits: " + bluePrint.cacheHits);
+        }
+        return result;
     }
 
-    private static int runBluePrintDfs(BluePrint bluePrint, HashMap<String, Integer> cache, int time, int[] resources, int[] botsCount) {
+    private static int runBluePrintDfs(BluePrint bluePrint, Map<String, Integer> cache, int time, int[] resources, int[] botsCount) {
+        bluePrint.stepCounts++;
+
         if (time == 0) {
             return resources[3];
         }
 
-        var key = time + ",";
-        for (var i = 0; i < 4; i++) {
-            key += resources[i] + "," + botsCount[i] + ",";
+        var key = getCacheKey(time, resources, botsCount);
+        var cacheValue = cache.get(key);
+        if (cacheValue != null) {
+            bluePrint.cacheHits++;
+            return cacheValue;
         }
-        if (cache.containsKey(key)) {
-            return cache.get(key);
-        }
+
         var result = 0;
 
-        result = resources[3] + botsCount[3] * time;
+        // Always use first resource to buy something if we have enough.
+        var robotBought = -1;
 
-        for (var robot : bluePrint.robots) {
-            if (robot.resourceType != ResourceType.Geode && botsCount[robot.resourceType.ordinal()] >= bluePrint.maxCosts[robot.resourceType.ordinal()]) {
+        // or we can buy another robot, we can buy only one robot per time, so we have 4 options.
+        for (var robot = 3; robot >= 0; robot--) {
+            // Optimisation 1: It does not make a sense to produce more robots than a maximum costs of the robot,
+            // because we start to generate more resources than we can actually spend. It is better to spend them for geo robot.
+            if (robot != 3 && botsCount[robot] >= bluePrint.maxCosts[robot]) {
                 continue;
             }
-            var wait = 0;
-            var doBreak = false;
-            for (var cost : robot.buildCosts) {
-                if (botsCount[cost.type.ordinal()] == 0) {
-                    doBreak = true;
+            // Optimisation 2: If we have more material than we ever can spend in the remaining time,
+            // then we do not need to produce more robot of this type.
+            if (robot != 3 && resources[robot] >= time * bluePrint.maxCosts[robot]) {
+                continue;
+            }
+            // do we have enough material to buy another robot?
+            var enoughMat = true;
+            for (var mat = 0; mat < 4; mat++) {
+                enoughMat &= resources[mat] >= bluePrint.cost[robot][mat];
+                if (!enoughMat) {
                     break;
                 }
-                wait = Math.max(wait, (cost.cost - resources[cost.type.ordinal()]) / botsCount[cost.type.ordinal()]);
             }
-            if (doBreak) {
-                continue;
-            }
+            if (enoughMat) {
+                robotBought = robot;
+                var newResources = Arrays.copyOf(resources, resources.length);
+                var newRobots = Arrays.copyOf(botsCount, botsCount.length);
+                newRobots[robot]++;
+                for (var mat = 0; mat < 4; mat++) {
+                    newResources[mat] = newResources[mat] - bluePrint.cost[robot][mat] + botsCount[mat];
+                }
+                result = Math.max(result, runBluePrintDfs(bluePrint, cache, time - 1, newResources, newRobots));
 
-            var remTime = time - wait - 1;
-            if (remTime <= 0) {
-                continue;
+                // if we can buy a geo robot, we always buy it. This is proposed optimisation frm Reedit
+                if (robot == 3) {
+                    break;
+                }
             }
-
-            var newResources = Arrays.copyOf(resources, resources.length);
-            var newBots = Arrays.copyOf(botsCount, botsCount.length);
-            for (var i = 0; i < newResources.length; i++) {
-                newResources[i] = resources[i] + botsCount[i] * (wait + 1);
-            }
-            for (var cost : robot.buildCosts) {
-                newResources[cost.type.ordinal()] -= cost.cost;
-            }
-            newBots[robot.resourceType.ordinal()]++;
-
-            for (var i = 0; i < 3; i++) {
-                newResources[i] = Math.min(newResources[i], bluePrint.maxCosts[i] * remTime);
-            }
-
-            result = Math.max(result, runBluePrintDfs(bluePrint, cache, remTime, newResources, newBots));
         }
+
+        if (robotBought != 3) {
+            // generate resources
+            var newResources = Arrays.copyOf(resources, resources.length);
+            for (var robot = 0; robot < 4; robot++) {
+                newResources[robot] += botsCount[robot];
+            }
+
+            // Option: we can wait without buying anything
+            result = Math.max(result, runBluePrintDfs(bluePrint, cache, time - 1, newResources, botsCount));
+        }
+
+
         cache.put(key, result);
         return result;
+    }
+
+    private static String getCacheKey(int time, int[] resources, int[] botsCount) {
+        var sb = new StringBuilder();
+        sb.append(time);
+        sb.append('-');
+        for (var i = 0; i < 4; i++) {
+            sb.append(resources[i]);
+            sb.append(',');
+        }
+        sb.append('-');
+        for (var i = 0; i < 4; i++) {
+            sb.append(botsCount[i]);
+            sb.append(',');
+        }
+        return sb.toString();
     }
 
     private static List<BluePrint> readBluePrints(List<String> input) {
@@ -101,30 +146,24 @@ public class Day19 extends CodeBase {
                     .toArray(String[]::new);
 
             var bluePrint = new BluePrint();
-            var oreRobot = new Robot(ResourceType.Ore);
-            oreRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[0]));
-            oreRobot.robotCount = 1;
-            bluePrint.robots[0] = oreRobot;
+            var costs = new int[6];
+            for (var i = 0; i <= 5; i++) {
+                var strPart = bluePrintParts[i].split(" ");
+                costs[i] = Integer.parseInt(strPart[0]);
+            }
 
-            var clayRobot = new Robot(ResourceType.Clay);
-            clayRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[1]));
-            bluePrint.robots[1] = clayRobot;
+            bluePrint.cost[0][0] = costs[0];
+            bluePrint.cost[1][0] = costs[1];
+            bluePrint.cost[2][0] = costs[2];
+            bluePrint.cost[2][1] = costs[3];
+            bluePrint.cost[3][0] = costs[4];
+            bluePrint.cost[3][2] = costs[5];
 
-            var obsidianRobot = new Robot(ResourceType.Obsidian);
-            obsidianRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[2]));
-            obsidianRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[3]));
-            bluePrint.robots[2] = obsidianRobot;
-
-            var geodeRobot = new Robot(ResourceType.Geode);
-            geodeRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[4]));
-            geodeRobot.buildCosts.add(ResourceCost.parse(bluePrintParts[5]));
-            bluePrint.robots[3] = geodeRobot;
 
             // calc max usable resource for optimizations
-
-            for (var i = 0; i < 4; i++) {
-                for (var cost : bluePrint.robots[i].buildCosts){
-                    bluePrint.maxCosts[cost.type.ordinal()] = Math.max(bluePrint.maxCosts[cost.type.ordinal()], cost.cost);
+            for (var robot = 0; robot < 4; robot++) {
+                for (var mat = 0; mat < 4; mat++) {
+                    bluePrint.maxCosts[mat] = Math.max(bluePrint.maxCosts[mat], bluePrint.cost[robot][mat]);
                 }
             }
 
@@ -133,52 +172,11 @@ public class Day19 extends CodeBase {
         return bluePrints;
     }
 
-    private static class Robot {
-
-        private final List<ResourceCost> buildCosts = new ArrayList<>();
-        private final ResourceType resourceType;
-
-        private int resourceCount;
-
-        private int robotCount;
-
-        private Robot(ResourceType resourceType) {
-            this.resourceType = resourceType;
-        }
-    }
-
-    private enum ResourceType {
-        Ore,
-        Clay,
-        Obsidian,
-        Geode
-    }
-
-    private static class ResourceCost {
-        private final int cost;
-        private final ResourceType type;
-
-        public ResourceCost(int cost, ResourceType type) {
-            this.cost = cost;
-            this.type = type;
-        }
-
-        public static ResourceCost parse(String str) {
-            var strPart = str.split(" ");
-            var resourceType = switch (strPart[1]) {
-                case "ore" -> ResourceType.Ore;
-                case "clay" -> ResourceType.Clay;
-                case "obsidian" -> ResourceType.Obsidian;
-                case "geode" -> ResourceType.Geode;
-                default -> throw new RuntimeException("Invalid resource type " + strPart[1]);
-            };
-            var resourceAmount = Integer.parseInt(strPart[0]);
-            return new ResourceCost(resourceAmount, resourceType);
-        }
-    }
-
     public static class BluePrint {
-        private final Robot[] robots = new Robot[4];
+        private final int[][] cost = new int[4][4];
         public final int[] maxCosts = new int[4];
+
+        public long stepCounts;
+        public int cacheHits;
     }
 }
