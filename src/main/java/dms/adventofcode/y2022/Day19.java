@@ -5,11 +5,11 @@ import dms.adventofcode.CodeBase;
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Day 19: Not Enough Minerals. Robots collecting minerals, find the way to collect most of the geodes.
  */
-// todo: improve required memory and speed for this puzzle (takes 5 min to complete and requires 16GB memory for the cache, Part 2)
 public class Day19 extends CodeBase {
 
     public static long part1(List<String> input) {
@@ -22,10 +22,20 @@ public class Day19 extends CodeBase {
             var resources = new int[] { 0, 0, 0, 0 };
             var bots = new int[] { 1, 0, 0, 0 };
             var cache = new HashMap<String, Integer>();
-            var geos = runBluePrintDfs(bluePrint, cache, 24, resources, bots);
+            var resourcesTrack = new ArrayList<int[]>();
+            var botsTrack = new ArrayList<int[]>();
+            var geos = runBluePrintDfs(bluePrint, cache, 24, 0, resources, bots, resourcesTrack, botsTrack);
             total += (i + 1) * geos;
             System.out.println("Blueprint " + (i + 1) + " score=" + geos + "; Calculated steps: " + bluePrint.stepCounts
                     + "; Cache size: " + cache.size() + "; Cache hits: " + bluePrint.cacheHits);
+
+            System.out.println("Minerals and bots tracking:");
+            for (var j = 0; j < resourcesTrack.size(); j++) {
+                System.out.print("Minute " + (j) + ": ");
+                System.out.print("[" + Arrays.stream(resourcesTrack.get(j)).mapToObj(Integer::toString).collect(Collectors.joining(",")) + "]");
+                System.out.println(", [" + Arrays.stream(botsTrack.get(j)).mapToObj(Integer::toString).collect(Collectors.joining(",")) + "]");
+            }
+            System.out.println();
         }
         return total;
     }
@@ -40,16 +50,23 @@ public class Day19 extends CodeBase {
             var resources = new int[] { 0, 0, 0, 0 };
             var bots = new int[] { 1, 0, 0, 0 };
             var cache = new HashMap<String, Integer>();
-            var geos = runBluePrintDfs(bluePrint, cache, 32, resources, bots);
+            var resourcesTrack = new ArrayList<int[]>();
+            var botsTrack = new ArrayList<int[]>();
+            var geos = runBluePrintDfs(bluePrint, cache, 32, 0, resources, bots, resourcesTrack, botsTrack);
             result *= geos;
             System.out.println("Blueprint " + (i + 1) + " score=" + geos + "; Calculated steps: " + bluePrint.stepCounts
                     + "; Cache size: " + cache.size() + "; Cache hits: " + bluePrint.cacheHits);
+
         }
         return result;
     }
 
-    private static int runBluePrintDfs(BluePrint bluePrint, Map<String, Integer> cache, int time, int[] resources, int[] botsCount) {
+    private static int runBluePrintDfs(BluePrint bluePrint, Map<String, Integer> cache, int time, int currentMax,
+                                       int[] resources, int[] botsCount, List<int[]> resourcesTrack, List<int[]> botsTrack) {
         bluePrint.stepCounts++;
+
+        resourcesTrack.add(resources);
+        botsTrack.add(botsCount);
 
         if (time == 0) {
             return resources[3];
@@ -62,12 +79,21 @@ public class Day19 extends CodeBase {
             return cacheValue;
         }
 
+        // lets assume we can produce geo robot every next turn. It will generate these max amount of geo resources:
+        var maxPossible = time * botsCount[3] + resources[3] + time * (time - 1) / 2;
+        if (maxPossible < currentMax) {
+            return 0;
+        }
+
         var result = 0;
 
         // Always use first resource to buy something if we have enough.
         var robotBought = -1;
 
         // or we can buy another robot, we can buy only one robot per time, so we have 4 options.
+        var bestResourcesTrack = new ArrayList<int[]>();
+        var bestBotsTrack = new ArrayList<int[]>();
+
         for (var robot = 3; robot >= 0; robot--) {
             // Optimisation 1: It does not make a sense to produce more robots than a maximum costs of the robot,
             // because we start to generate more resources than we can actually spend. It is better to spend them for geo robot.
@@ -76,7 +102,7 @@ public class Day19 extends CodeBase {
             }
             // Optimisation 2: If we have more material than we ever can spend in the remaining time,
             // then we do not need to produce more robot of this type.
-            if (robot != 3 && resources[robot] >= time * bluePrint.maxCosts[robot]) {
+            if (robot != 3 && resources[robot] >= time * (bluePrint.maxCosts[robot] - botsCount[robot])) {
                 continue;
             }
             // do we have enough material to buy another robot?
@@ -88,18 +114,31 @@ public class Day19 extends CodeBase {
                 }
             }
             if (enoughMat) {
-                robotBought = robot;
                 var newResources = Arrays.copyOf(resources, resources.length);
                 var newRobots = Arrays.copyOf(botsCount, botsCount.length);
                 newRobots[robot]++;
                 for (var mat = 0; mat < 4; mat++) {
                     newResources[mat] = newResources[mat] - bluePrint.cost[robot][mat] + botsCount[mat];
                 }
-                result = Math.max(result, runBluePrintDfs(bluePrint, cache, time - 1, newResources, newRobots));
+                if (false) {
+                    System.out.println("Creating a robot " + robot + " at the remaining time " + time);
+                }
+                var newResourcesTrack = new ArrayList<int[]>();
+                var newBotsTrack = new ArrayList<int[]>();
+                var newResult = runBluePrintDfs(bluePrint, cache, time - 1, currentMax, newResources, newRobots, newResourcesTrack, newBotsTrack);
+                if (newResult > result) {
+                    result = newResult;
+                    currentMax = newResult;
+                    robotBought = robot;
+                    bestResourcesTrack.clear();
+                    bestResourcesTrack.addAll(newResourcesTrack);
+                    bestBotsTrack.clear();
+                    bestBotsTrack.addAll(newBotsTrack);
+                }
 
                 // if we can buy a geo robot, we always buy it. This is proposed optimisation frm Reedit
                 if (robot == 3) {
-                    break;
+                    // break;
                 }
             }
         }
@@ -112,11 +151,24 @@ public class Day19 extends CodeBase {
             }
 
             // Option: we can wait without buying anything
-            result = Math.max(result, runBluePrintDfs(bluePrint, cache, time - 1, newResources, botsCount));
+            var newResourcesTrack = new ArrayList<int[]>();
+            var newBotsTrack = new ArrayList<int[]>();
+            var newResult = runBluePrintDfs(bluePrint, cache, time - 1, currentMax, newResources, botsCount, newResourcesTrack, newBotsTrack);
+            if (newResult > result) {
+                bestResourcesTrack.clear();
+                bestResourcesTrack.addAll(newResourcesTrack);
+                bestBotsTrack.clear();
+                bestBotsTrack.addAll(newBotsTrack);
+                result = newResult;
+            }
         }
 
+        resourcesTrack.addAll(bestResourcesTrack);
+        botsTrack.addAll(bestBotsTrack);
 
-        cache.put(key, result);
+        if (resources[3] == 0) {
+            cache.put(key, result);
+        }
         return result;
     }
 
@@ -179,4 +231,5 @@ public class Day19 extends CodeBase {
         public long stepCounts;
         public int cacheHits;
     }
+
 }

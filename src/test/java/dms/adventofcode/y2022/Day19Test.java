@@ -1,7 +1,6 @@
 package dms.adventofcode.y2022;
 
 import dms.adventofcode.TestInput;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 
 import java.io.IOException;
@@ -9,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled("Very slow test, and requires at least 16GB memory (can be improved)")
+//@Disabled("Very slow test, and requires at least 16GB memory (can be improved)")
 class Day19Test {
 
     @ParameterizedTest
