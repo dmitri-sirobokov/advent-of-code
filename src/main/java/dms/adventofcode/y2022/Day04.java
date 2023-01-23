@@ -2,16 +2,19 @@ package dms.adventofcode.y2022;
 
 import java.util.List;
 
+/**
+ * Day 4: Camp Cleanup
+ */
 public class Day04 {
 
-    public static long countFullyOverlappedSectionsPart1(List<String> input) {
+    public static long part1(List<String> input) {
         return input.stream()
                 .map(Pair::parse)
                 .filter(Pair::isFullyOverlapped)
                 .count();
     }
 
-    public static long countHasOverlappedSectionsPart2(List<String> input) {
+    public static long part2(List<String> input) {
         return input.stream()
                 .map(Pair::parse)
                 .filter(Pair::hasOverlap)

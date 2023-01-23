@@ -3,6 +3,10 @@ package dms.adventofcode.y2022;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Day 2: Rock Paper Scissors
+ * Play the game
+ */
 public class Day02 {
 
     public static int calcScore(List<String> input) {

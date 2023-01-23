@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Day 7: No Space Left On Device.
+ * Find the folder to delete and free up the space on the device.
+ */
 public class Day07 {
 
     private Day07() { }

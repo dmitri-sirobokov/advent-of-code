@@ -6,7 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Day 8: Treetop Tree House
+ * Day 8: Treetop Tree House.
+ * Find the best place for the tree house.
  */
 public class Day08 extends CodeBase {
 

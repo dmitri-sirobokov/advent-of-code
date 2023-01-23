@@ -1,5 +1,6 @@
 package dms.adventofcode.y2022;
 
+import dms.adventofcode.TestBase;
 import dms.adventofcode.TestInput;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class Day25Test {
+class Day25Test extends TestBase {
 
     @Test
     void decimalToSnafu() {

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Day 5: Supply Stacks
+ */
 public class Day05 {
 
     public enum CraneType {

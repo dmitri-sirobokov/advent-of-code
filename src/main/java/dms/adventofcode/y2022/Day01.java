@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Day 1: Calorie Counting.
+ * Find elf's carrying the most calories.
+ */
 public class Day01 {
 
     /**

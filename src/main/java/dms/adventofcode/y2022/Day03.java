@@ -3,6 +3,9 @@ package dms.adventofcode.y2022;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Day 3: Rucksack Reorganization
+ */
 public class Day03 {
 
     public static int rucksackReorganizationPrioritySum(List<String> input) {

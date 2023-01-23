@@ -2,6 +2,10 @@ package dms.adventofcode.y2022;
 
 import java.util.List;
 
+/**
+ * Day 6: Tuning Trouble ---
+ * Find unique marker.
+ */
 public class Day06 {
 
     public static int findMarkerIndex(List<String> input) {
