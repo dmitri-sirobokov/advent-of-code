@@ -8,7 +8,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@Disabled("Very slow test, and requires at least 16GB memory (can be improved)")
 class Day19Test {
 
     @ParameterizedTest
