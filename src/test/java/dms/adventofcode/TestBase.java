@@ -3,6 +3,7 @@ package dms.adventofcode;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +13,11 @@ import java.util.Objects;
 public class TestBase {
 
     public static List<String> readResourceFile(String resourcePath) throws IOException {
+
         try (var resourceStream = TestBase.class.getClassLoader().getResourceAsStream(resourcePath)) {
+            if (resourceStream == null) {
+                throw new FileNotFoundException(resourcePath);
+            }
             return readLines(IOUtils.toString(Objects.requireNonNull(resourceStream), StandardCharsets.UTF_8));
         }
     }

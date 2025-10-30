@@ -1,2 +1,3 @@
 /target/
-/.idea/
+.idea/*
+!/.idea/file.template.settings.xml
