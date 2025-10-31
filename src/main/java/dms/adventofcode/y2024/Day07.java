@@ -11,13 +11,7 @@ import java.util.List;
  */
 public class Day07 {
 
-    private static class CalibrationEquation {
-        private final long expectedValue;
-        private final int[] numbers;
-        private CalibrationEquation(long expectedValue, int[] numbers) {
-            this.expectedValue = expectedValue;
-            this.numbers = numbers;
-        }
+    private record CalibrationEquation(long expectedValue, int[] numbers) {
     }
 
     private static class CalibrationData {
