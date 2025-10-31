@@ -1,6 +1,7 @@
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};
 
 #end
+#set ($MyYear=${PACKAGE_NAME.substring(${PACKAGE_NAME.lastIndexOf(".")}+1)})
 
 import dms.adventofcode.TestInput;
 import org.junit.jupiter.params.ParameterizedTest;
