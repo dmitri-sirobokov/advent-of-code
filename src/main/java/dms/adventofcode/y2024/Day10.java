@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Day10:
+ * Day10: Hoof It
  *
  */
 public class Day10 extends CodeBase {
