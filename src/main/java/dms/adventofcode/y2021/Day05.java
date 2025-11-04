@@ -1,5 +1,7 @@
 package dms.adventofcode.y2021;
 
+import dms.adventofcode.Vector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +13,9 @@ public class Day05 {
             var line = parseLine(inputLine);
             lines.add(line);
         }
-        var maxX = 1 + lines.stream().map(l -> Math.max(l.a.x, l.b.x)).max(Integer::compareTo).orElse(0);
-        var maxY = 1 + lines.stream().map(l -> Math.max(l.a.y, l.b.y)).max(Integer::compareTo).orElse(0);
-        var intersections = new byte[maxY][maxX];
+        var maxX = 1 + lines.stream().map(l -> Math.max(l.a.x(), l.b.x())).max(Long::compareTo).orElse(0L);
+        var maxY = 1 + lines.stream().map(l -> Math.max(l.a.y(), l.b.y())).max(Long::compareTo).orElse(0L);
+        var intersections = new byte[(int)maxY][(int)maxX];
         for (var x = 0; x < maxX; x++) {
             for (var y = 0; y < maxY; y++) {
                 for (var line : lines) {
@@ -48,44 +50,33 @@ public class Day05 {
     private static Line parseLine(String line) {
         var lineParts = line.split(" -> ");
         assert lineParts.length == 2;
-        var a = Point.parse(lineParts[0]);
-        var b = Point.parse(lineParts[1]);
+        var a = Vector.parse(lineParts[0]);
+        var b = Vector.parse(lineParts[1]);
         return new Line(a, b);
     }
 
-    private record Point(int x, int y) {
-            public static Point parse(String value) {
-                var valueParts = value.trim().split(",");
-                assert valueParts.length == 2;
-                var x = Integer.parseInt(valueParts[0].trim());
-                var y = Integer.parseInt(valueParts[1].trim());
-                return new Point(x, y);
-            }
-
-    }
-
-    private record Line(Point a, Point b) {
+    private record Line(Vector a, Vector b) {
 
         public long crossProd(int x, int y) {
-                return (long) (b.x - a.x) * (y - a.y) - (long) (b.y - a.y) * (x - a.x);
+                return (b.x() - a.x()) * (y - a.y()) - (b.y() - a.y()) * (x - a.x());
             }
 
             public long dotProd(int x, int y) {
-                return (long) (b.x - a.x) * (x - a.x) + (long) (b.y - a.y) * (y - a.y);
+                return (b.x() - a.x()) * (x - a.x()) + (b.y() - a.y()) * (y - a.y());
             }
 
             public boolean isHorizontal() {
-                return a.y == b.y;
+                return a.y() == b.y();
             }
 
             public boolean isVertical() {
-                return a.x == b.x;
+                return a.x() == b.x();
             }
 
             public long lengthSqr() {
-                var x = b.x - a.x;
-                var y = b.y - a.y;
-                return (long) x * x + (long) y * y;
+                var x = b.x() - a.x();
+                var y = b.y() - a.y();
+                return x * x + y * y;
             }
         }
 }

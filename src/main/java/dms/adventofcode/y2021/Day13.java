@@ -1,5 +1,7 @@
 package dms.adventofcode.y2021;
 
+import dms.adventofcode.Vector;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,21 +87,20 @@ public class Day13 {
     }
 
     private static boolean[][] readDots(List<String> input) {
-        var points = new ArrayList<Point>();
+        var points = new ArrayList<Vector>();
         for (var line : input) {
             if (line.isBlank()) {
                 break;
             }
 
-            var lineParts = line.split(",");
-            var point = new Point(Integer.parseInt(lineParts[0]), Integer.parseInt(lineParts[1]));
+            var point = Vector.parse(line);
             points.add(point);
         }
 
-        var xMax = points.stream().mapToInt(p -> p.x).max().orElse(0);
-        var yMax = points.stream().mapToInt(p -> p.y).max().orElse(0);
+        var xMax = points.stream().mapToInt(Vector::intX).max().orElse(0);
+        var yMax = points.stream().mapToInt(Vector::intY).max().orElse(0);
         var result = new boolean[yMax + 1][xMax + 1];
-        points.forEach(p -> result[p.y][p.x] = true);
+        points.forEach(p -> result[p.intY()][p.intX()] = true);
         return result;
     }
 
@@ -114,8 +115,6 @@ public class Day13 {
         }
         return foldInstructions;
     }
-
-    private record Point(int x, int y) { }
 
     private record FoldInstruction(int position, boolean isX) { }
 }

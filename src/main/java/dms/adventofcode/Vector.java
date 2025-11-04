@@ -2,6 +2,14 @@ package dms.adventofcode;
 
 public record Vector(long x, long y) {
 
+    public static Vector parse(String value) {
+        var valueParts = value.trim().split(",");
+        assert valueParts.length >= 2;
+        var x = Long.parseLong(valueParts[0].trim());
+        var y = Long.parseLong(valueParts[1].trim());
+        return new Vector(x, y);
+    }
+
     public boolean isEmpty() {
         return x == 0 || y == 0;
     }
