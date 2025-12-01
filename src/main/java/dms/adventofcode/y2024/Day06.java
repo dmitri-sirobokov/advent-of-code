@@ -1,6 +1,8 @@
 package dms.adventofcode.y2024;
 
 
+import dms.adventofcode.Vector;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +16,7 @@ public class Day06 {
 
     private static class MapCellState {
         private boolean isObstruction;
-        private final Set<Direction> visitedDirections = new HashSet<>();
+        private final Set<Vector> visitedDirections = new HashSet<>();
     }
 
     private enum GuardRunState {
@@ -27,19 +29,16 @@ public class Day06 {
 
     }
 
-    private record Location(int row, int col) { }
-    private record Direction(int x, int y) { }
-
     private static class Map {
         private final MapCellState[][] cells;
-        private Location guardLocation;
-        private Direction guardDirection;
+        private Vector guardLocation;
+        private Vector guardDirection;
         private int visitCount;
 
         public Map(List<String> input) {
             cells = new MapCellState[input.size()][];
-            guardLocation = new Location(0, 0);
-            guardDirection = new Direction(1, 0);
+            guardLocation = new Vector(0, 0);
+            guardDirection = new Vector(1, 0);
             for (int i = 0; i < input.size(); i++) {
                 var line = input.get(i);
                 cells[i] = new MapCellState[line.length()];
@@ -48,12 +47,12 @@ public class Day06 {
                     var ch =  line.charAt(j);
                     switch (ch) {
                         case '^', '>', 'v', 'V', '<':
-                            guardLocation = new Location(i, j);
+                            guardLocation = new Vector(i, j);
                             guardDirection = switch (ch) {
-                                case '^' -> new Direction(0, -1);
-                                case '>' -> new Direction(1, 0);
-                                case 'V','v' -> new Direction(0, 1);
-                                case '<' -> new Direction(-1, 0);
+                                case '^' -> new Vector(0, -1);
+                                case '>' -> new Vector(1, 0);
+                                case 'V','v' -> new Vector(0, 1);
+                                case '<' -> new Vector(-1, 0);
                                 default -> throw new IllegalArgumentException(Character.toString(ch));
                             };
                             this.cells[i][j].visitedDirections.add(this.guardDirection);
@@ -68,16 +67,16 @@ public class Day06 {
 
         private GuardRunState moveGuard() {
             var nextGuardLocation = getNextGuardLocation();
-            if (nextGuardLocation.col < 0 || nextGuardLocation.col >= cells[0].length) {
+            if (nextGuardLocation.x() < 0 || nextGuardLocation.x() >= cells[0].length) {
                 return GuardRunState.EXIT_MAP;
             }
-            if (nextGuardLocation.row < 0 || nextGuardLocation.row >= cells.length) {
+            if (nextGuardLocation.y() < 0 || nextGuardLocation.y() >= cells.length) {
                 return GuardRunState.EXIT_MAP;
             }
-            var nextGuardCell = cells[nextGuardLocation.row][nextGuardLocation.col];
+            var nextGuardCell = cells[nextGuardLocation.intY()][nextGuardLocation.intX()];
             if (nextGuardCell.isObstruction) {
-                // rotate direction 90 degrees clockwise (simplified transformation matrix
-                this.guardDirection = new Direction(-this.guardDirection.y, this.guardDirection.x);
+
+                this.guardDirection = this.guardDirection.rotate90deg(true);
             } else {
                 this.guardLocation = nextGuardLocation;
                 if (nextGuardCell.visitedDirections.contains(this.guardDirection)) {
@@ -88,8 +87,8 @@ public class Day06 {
             return GuardRunState.RUNNING;
         }
 
-        private Location getNextGuardLocation() {
-            return new Location(guardLocation.row + guardDirection.y, guardLocation.col + guardDirection.x);
+        private Vector getNextGuardLocation() {
+            return guardLocation.add(guardDirection);
         }
 
         public GuardRunState runGuard() {
@@ -121,23 +120,23 @@ public class Day06 {
         map.runGuard();
 
         // get all visited locations and try to loop the guard by setting an obstruction
-        var visitedLocations = new ArrayList<Location>();
+        var visitedLocations = new ArrayList<Vector>();
         for  (var i = 0; i < map.cells.length; i++) {
             for (var j = 0; j < map.cells[i].length; j++) {
                 if (!map.cells[i][j].visitedDirections.isEmpty()) {
-                    visitedLocations.add(new Location(i, j));
+                    visitedLocations.add(new Vector(i, j));
                 }
             }
         }
 
         var loopCounts = 0;
-        for (Location visitedLocation : visitedLocations) {
+        for (var visitedLocation : visitedLocations) {
             map = new Map(input);
             // can't put an obstacle right next in front of the guard, without him noticing it.
             if (visitedLocation.equals(map.guardLocation) || visitedLocation.equals(map.getNextGuardLocation())) {
                 continue;
             }
-            map.cells[visitedLocation.row][visitedLocation.col].isObstruction = true;
+            map.cells[visitedLocation.intY()][visitedLocation.intX()].isObstruction = true;
             if (map.runGuard() == GuardRunState.LOOP) {
                 loopCounts++;
             }
