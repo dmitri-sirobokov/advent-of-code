@@ -9,56 +9,47 @@ import java.util.List;
  */
 public class Day01 {
 
-    private static int[] readNumbers(List<String> lines) {
+    private static int[] readDeltas(List<String> lines) {
         return lines.stream().mapToInt(line -> {
             var dir = line.substring(0, 1);
-            var num  = Integer.parseInt(line.substring(1));
-            return dir.equals("L") ? -num : num;
+            var delta  = Integer.parseInt(line.substring(1));
+            return dir.equals("L") ? -delta : delta;
         }).toArray();
     }
 
     public static long part1(List<String> input) {
-        var current = 50;
-        var result = 0;
-        var numbers = readNumbers(input);
-        for (var num : numbers) {
-            current += num;
-            current = current % 100;
-            if (current < 0) {
-                current += 100;
+        var pos = 50L;
+        var crossings = 0L;
+        var deltas = readDeltas(input);
+        for (var delta : deltas) {
+            var next = pos + delta;
+            if (next % 100 == 0) {
+                crossings++;
             }
-            if (current == 0) {
-                result++;
-            }
+            pos = next;
         }
-        return result;
+        return crossings;
     }
 
     public static long part2(List<String> input) {
-        var current = 50;
-        var result = 0;
-        var numbers = readNumbers(input);
-        for (var num : numbers) {
-            var newCurrent = current + num;
-            if (newCurrent == 0) {
-                result++;
-            } else if (newCurrent < 0) {
-                result -= newCurrent / 100;
-            } else {
-                result += newCurrent / 100;
+        var pos = 50L;
+        var crossings = 0L;
+        var deltas = readDeltas(input);
+        for (var delta : deltas) {
+            var next = pos + delta;
+            var prevBucket = Math.floorDiv(pos, 100);
+            var nextBucket = Math.floorDiv(next, 100);
+            crossings += Math.abs(nextBucket - prevBucket);
+            // do not count starting 0-position as crossing when moving to lower number
+            if (pos % 100 == 0 && delta < 0) {
+                crossings--;
             }
-            // if starting position was already zero then do not count it.
-            if (current != 0 && newCurrent < 0) {
-                result++;
+            // count as crossing when reaching 0 position and moving to lower number
+            if (next % 100 == 0 && delta < 0) {
+                crossings++;
             }
-
-
-            newCurrent = newCurrent % 100;
-            if (newCurrent < 0) {
-                newCurrent += 100;
-            }
-            current = newCurrent;
+            pos = next;
         }
-        return result;
+        return crossings;
     }
 }
