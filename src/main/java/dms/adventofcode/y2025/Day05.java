@@ -1,10 +1,7 @@
 package dms.adventofcode.y2025;
 
-
 import dms.adventofcode.CodeBase;
 import dms.adventofcode.Range;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,17 +24,19 @@ public class Day05 extends CodeBase {
 
     private record Ingredients(List<Range> freshRanges, List<Long> availableIngredients, long freshCount) { }
 
+    private static Range parseRange(String str) {
+        var parts = str.split("-");
+        var start = Long.parseLong(parts[0]);
+        var end = Long.parseLong(parts[1]);
+        return new Range(start, end);
+    }
+
     private static Ingredients readIngredients(List<String> lines) {
         var firstBlockEndPos = lines.indexOf("");
         var firstList = lines.subList(0, firstBlockEndPos);
-        List<Range> freshRanges = new ArrayList<>();
-        for (var line : firstList) {
-            var parts = line.split("-");
-            var start = Long.parseLong(parts[0]);
-            var end = Long.parseLong(parts[1]);
-            var range = new Range(start, end);
-            freshRanges.add(range);
-        }
+        List<Range> freshRanges = firstList.stream()
+                .map(Day05::parseRange)
+                .toList();
 
         var secondList = lines.subList(firstBlockEndPos + 1, lines.size());
         var availableIngredients = secondList.stream()
