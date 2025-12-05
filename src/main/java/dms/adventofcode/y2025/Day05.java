@@ -37,7 +37,6 @@ public class Day05 extends CodeBase {
 
     private static Ingredients scanIngredients(List<String> input) {
         var ingredients = readIngredients(input);
-        ingredients.freshRanges = mergeRanges(ingredients.freshRanges);
         ingredients.freshCount = ingredients.availableIngredients.stream()
                 .filter(ingredient -> ingredients.freshRanges.stream()
                         .anyMatch(range -> ingredient >= range.start() && ingredient <= range.end()))
