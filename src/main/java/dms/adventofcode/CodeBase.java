@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -142,9 +144,9 @@ public class CodeBase {
     }
 
     protected static void printMatrix(char[][] matrix) {
-        for (var y = 0; y < matrix.length; y++) {
-            for (var x = 0; x < matrix[y].length; x++) {
-                System.out.print(matrix[y][x]);
+        for (char[] chars : matrix) {
+            for (char ch : chars) {
+                System.out.print(ch);
             }
             System.out.println();
         }
@@ -167,6 +169,33 @@ public class CodeBase {
         return a;
     }
 
+    /**
+     * Merge overlapped ranges.
+     */
+    protected static List<Range> mergeRanges(List<Range> ranges) {
+        List<Range> sorted = new ArrayList<>(ranges);
+        sorted.sort(Comparator.comparingLong(Range::start).thenComparingLong(Range::end));
+
+        List<Range> merged = new ArrayList<>();
+        long curStart = sorted.getFirst().start();
+        long curEnd   = sorted.getFirst().end();
+
+        for (int i = 1; i < sorted.size(); i++) {
+            Range next = sorted.get(i);
+            boolean shouldMerge = next.start() <= curEnd + 1L;
+
+            if (shouldMerge) {
+                if (next.end() > curEnd) curEnd = next.end();
+            } else {
+                merged.add(new Range(curStart, curEnd));
+                curStart = next.start();
+                curEnd   = next.end();
+            }
+        }
+        merged.add(new Range(curStart, curEnd));
+        return merged;
+    }
+
     public interface MatrixForEachConsumer {
         void apply(int x, int y);
     }
@@ -182,5 +211,4 @@ public class CodeBase {
     public interface MapArrayFunctionXY<R, V> {
         R apply(int x, int y, V value);
     }
-
 }
