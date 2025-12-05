@@ -34,21 +34,22 @@ public class Day05 extends CodeBase {
     private static Ingredients readIngredients(List<String> lines) {
         var firstBlockEndPos = lines.indexOf("");
         var firstList = lines.subList(0, firstBlockEndPos);
-        List<Range> freshRanges = firstList.stream()
-                .map(Day05::parseRange)
-                .toList();
-
         var secondList = lines.subList(firstBlockEndPos + 1, lines.size());
+
+        List<Range> freshRanges = mergeRanges(
+                firstList.stream()
+                .map(Day05::parseRange)
+                .toList());
+
         var availableIngredients = secondList.stream()
                 .map(Long::parseLong)
                 .toList();
 
-        var mergedRanges = mergeRanges(freshRanges);
         var freshCount = availableIngredients.stream()
-                .filter(ingredient -> mergedRanges.stream()
+                .filter(ingredient -> freshRanges.stream()
                         .anyMatch(range -> ingredient >= range.start() && ingredient <= range.end()))
                 .count();
 
-        return new Ingredients(mergedRanges, availableIngredients, freshCount);
+        return new Ingredients(freshRanges, availableIngredients, freshCount);
     }
 }
