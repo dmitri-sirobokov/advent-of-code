@@ -14,47 +14,24 @@ import java.util.List;
 public class Day05 extends CodeBase {
 
     public static long part1(List<String> input) {
-        var ingredients = scanIngredients(input);
+        var ingredients = readIngredients(input);
         return ingredients.freshCount;
     }
 
     public static long part2(List<String> input) {
-        var ingredients = scanIngredients(input);
+        var ingredients = readIngredients(input);
         return ingredients.freshRanges.stream()
                 .mapToLong(Range::length)
                 .sum();
     }
 
-    private static class Ingredients {
-        public List<Range> freshRanges;
-        public List<Long> availableIngredients;
-        public long freshCount;
-        Ingredients(List<Range> freshRanges, List<Long> availableIngredients) {
-            this.freshRanges = freshRanges;
-            this.availableIngredients = availableIngredients;
-        }
-    }
-
-    private static Ingredients scanIngredients(List<String> input) {
-        var ingredients = readIngredients(input);
-        ingredients.freshCount = ingredients.availableIngredients.stream()
-                .filter(ingredient -> ingredients.freshRanges.stream()
-                        .anyMatch(range -> ingredient >= range.start() && ingredient <= range.end()))
-                .count();
-        return ingredients;
-    }
+    private record Ingredients(List<Range> freshRanges, List<Long> availableIngredients, long freshCount) { }
 
     private static Ingredients readIngredients(List<String> lines) {
+        var firstBlockEndPos = lines.indexOf("");
+        var firstList = lines.subList(0, firstBlockEndPos);
         List<Range> freshRanges = new ArrayList<>();
-        List<Long> availableIngredients = new ArrayList<>();
-        var secondBlockPos = 0;
-        for (var i = 0; i < lines.size(); i++) {
-            var line = lines.get(i);
-            if (line.isEmpty()) {
-                secondBlockPos = i + 1;
-                break;
-            }
-
+        for (var line : firstList) {
             var parts = line.split("-");
             var start = Long.parseLong(parts[0]);
             var end = Long.parseLong(parts[1]);
@@ -62,14 +39,17 @@ public class Day05 extends CodeBase {
             freshRanges.add(range);
         }
 
-        freshRanges = mergeRanges(freshRanges);
+        var secondList = lines.subList(firstBlockEndPos + 1, lines.size());
+        var availableIngredients = secondList.stream()
+                .map(Long::parseLong)
+                .toList();
 
-        for (var i = secondBlockPos; i < lines.size(); i++) {
-            var line = lines.get(i);
-            var availableIngredient = Long.parseLong(line);
-            availableIngredients.add(availableIngredient);
-        }
-        return new Ingredients(freshRanges, availableIngredients);
+        var mergedRanges = mergeRanges(freshRanges);
+        var freshCount = availableIngredients.stream()
+                .filter(ingredient -> mergedRanges.stream()
+                        .anyMatch(range -> ingredient >= range.start() && ingredient <= range.end()))
+                .count();
+
+        return new Ingredients(mergedRanges, availableIngredients, freshCount);
     }
-
 }
