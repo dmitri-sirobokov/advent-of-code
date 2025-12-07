@@ -7,7 +7,7 @@ import dms.adventofcode.Vector;
 import java.util.List;
 
 /**
- * Day07:
+ * Day07: Laboratories
  *
  */
 public class Day07 extends CodeBase {
