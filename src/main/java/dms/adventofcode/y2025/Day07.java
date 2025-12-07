@@ -40,11 +40,11 @@ public class Day07 extends CodeBase {
         beams[pos.intY()][pos.intX()] = true;
 
         if (map[pos.intY()][pos.intX()] == '^') {
-            var splitsL = countBeamSplits(map, new Vector(pos.x() - 1, pos.y() + 1), beams);
-            var splitsR = countBeamSplits(map, new Vector(pos.x() + 1, pos.y() + 1), beams);
+            var splitsL = countBeamSplits(map, new Vector(pos.x() - 1, pos.y() + 2), beams);
+            var splitsR = countBeamSplits(map, new Vector(pos.x() + 1, pos.y() + 2), beams);
             return splitsL + splitsR + 1;
         } else {
-            return countBeamSplits(map, new Vector(pos.x(), pos.y() + 1), beams);
+            return countBeamSplits(map, new Vector(pos.x(), pos.y() + 2), beams);
         }
     }
 
