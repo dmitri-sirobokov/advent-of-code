@@ -56,13 +56,13 @@ public class Day07 extends CodeBase {
         if (timelines[pos.intY()][pos.intX()] != 0) {
             return timelines[pos.intY()][pos.intX()];
         }
+        timelines[pos.intY()][pos.intX()]++;
 
         if (map[pos.intY()][pos.intX()] == '^') {
-            timelines[pos.intY()][pos.intX()]++;
-            timelines[pos.intY()][pos.intX()] += countTimelines(map, new Vector(pos.x() - 1, pos.y() + 1), timelines);
-            timelines[pos.intY()][pos.intX()] +=  countTimelines(map, new Vector(pos.x() + 1, pos.y() + 1), timelines);
+            timelines[pos.intY()][pos.intX()] += countTimelines(map, new Vector(pos.x() - 1, pos.y() + 2), timelines);
+            timelines[pos.intY()][pos.intX()] +=  countTimelines(map, new Vector(pos.x() + 1, pos.y() + 2), timelines);
         } else {
-            timelines[pos.intY()][pos.intX()] += countTimelines(map, new Vector(pos.x(), pos.y() + 1), timelines);
+            timelines[pos.intY()][pos.intX()] = countTimelines(map, new Vector(pos.x(), pos.y() + 2), timelines);
         }
         return timelines[pos.intY()][pos.intX()];
     }
