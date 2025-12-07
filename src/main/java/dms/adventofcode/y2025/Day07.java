@@ -14,27 +14,18 @@ public class Day07 extends CodeBase {
 
     public static long part1(List<String> input) {
         var map = readCharMatrix(input);
-        var start = findStartPos(map);
         var beams = new boolean[map.length][map[0].length];
-        return countBeamSplits(map, start, beams);
+        return countBeamSplits(map,  findStartPos(input), beams);
     }
 
    public static long part2(List<String> input) {
        var map = readCharMatrix(input);
-       var start = findStartPos(map);
        var timelines = new long[map.length][map[0].length];
-       return countTimelines(map, start, timelines) + 1;
+       return countTimelines(map, findStartPos(input), timelines) + 1;
     }
 
-    private static Vector findStartPos(char[][] map) {
-        for (var row = 0; row < map.length; row++) {
-            for (var col = 0; col < map[row].length; col++) {
-                if (map[row][col] == 'S') {
-                    return new Vector(col, row);
-                }
-            }
-        }
-        return new Vector(0, 0);
+    private static Vector findStartPos(List<String> input) {
+        return new Vector(input.getFirst().indexOf("S"), 0);
     }
 
     private static long countBeamSplits(char[][] map, Vector pos, boolean[][] beams) {
