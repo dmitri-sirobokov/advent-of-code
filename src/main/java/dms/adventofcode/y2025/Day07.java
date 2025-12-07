@@ -58,13 +58,11 @@ public class Day07 extends CodeBase {
         }
 
         if (map[pos.intY()][pos.intX()] == '^') {
-            var newTimeLines1 = countTimelines(map, new Vector(pos.x() - 1, pos.y() + 1), timelines);
-            var newTimeLines2 = countTimelines(map, new Vector(pos.x() + 1, pos.y() + 1), timelines);
-            timelines[pos.intY()][pos.intX()] = newTimeLines1 + newTimeLines2 + 1;
-
+            timelines[pos.intY()][pos.intX()]++;
+            timelines[pos.intY()][pos.intX()] += countTimelines(map, new Vector(pos.x() - 1, pos.y() + 1), timelines);
+            timelines[pos.intY()][pos.intX()] +=  countTimelines(map, new Vector(pos.x() + 1, pos.y() + 1), timelines);
         } else {
-            var newTimelines = countTimelines(map, new Vector(pos.x(), pos.y() + 1), timelines);
-            timelines[pos.intY()][pos.intX()] = newTimelines;
+            timelines[pos.intY()][pos.intX()] += countTimelines(map, new Vector(pos.x(), pos.y() + 1), timelines);
         }
         return timelines[pos.intY()][pos.intX()];
     }
