@@ -1,7 +1,5 @@
 package dms.adventofcode;
 
-import dms.adventofcode.y2024.Day06;
-
 import java.util.Objects;
 
 public record Vector(long x, long y) {
@@ -59,4 +57,6 @@ public record Vector(long x, long y) {
         // rotate direction 90 degrees (simplified transformation matrix)
         return clockwise ? new Vector(-this.y, this.x) : new Vector(this.y, -this.x);
     }
+
+    public long area(Vector other) { return Math.abs(other.x - this.x + 1) * Math.abs(other.y - this.y + 1); }
 }

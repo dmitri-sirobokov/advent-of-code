@@ -196,6 +196,7 @@ public class CodeBase {
         return merged;
     }
 
+
     public interface MatrixForEachConsumer {
         void apply(int x, int y);
     }
