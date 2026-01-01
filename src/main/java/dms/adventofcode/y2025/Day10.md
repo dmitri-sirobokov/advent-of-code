@@ -1,232 +1,207 @@
 
-The following is a sample input from Advent of Code 2025, Day 10, First machine (sample).
+# Advent of Code 2025 — Day 10: Factory (Java solution)
 
-https://adventofcode.com/2025/day/10
+> Goal: explain the implemented approach in clear, practical terms for readers with basic
+> linear algebra knowledge. Covers modeling, the parametric (null-space) form, feasibility,
+> minimization, and the Branch-and-Bound + Simplex strategy used for the few non‑trivial cases.
 
-```text
+---
+
+## Problem (rephrased)
+You are given a machine with **buttons** and **counters**. Each button is wired to a subset of counters.
+Pressing a button adds `1` to each counter it is connected to. The machine *activates* when counters
+match their target values.
+
+We need:
+
+1. **Part 1 (lights/XOR)** — find the smallest set of buttons to press **at most once** so that the light pattern
+   matches the target (XOR behavior). This is a subset search problem over 0/1 presses.
+2. **Part 2 (counters/ILP)** — allow buttons to be pressed multiple times; find a **feasible** assignment and then the
+   **optimal** one with the minimum total number of presses.
+
+> In code, Part 1 brute‑forces subsets and uses XOR to compute the light state; Part 2 models the counters as an
+> integer linear program (ILP) and solves it via parametric form and Branch‑and‑Bound + Simplex for the few hard cases.
+
+Example input (from the description):
+```
 (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}
 ```
+It represents 6 buttons (columns) wired to 4 counters (rows), and target counter values `{3,5,4,7}`.  
+We’ll model this as a matrix equation.
 
-It represents 5 buttons that are wired to specified counters, 
-and 4 counters with expected values 3,5,4,7 correspondingly, that's when machine is activated.
+---
 
-The task is to find minimum number of button clicks to activate the machine.
+## Notation
+- Let $A ∈ \{0,1\}^{m\times n}$ be the **wiring matrix** ($m$ counters, $n$ buttons). $A[i,j]=1$ means button $j$ affects counter $i$.
+- Let $x ∈ ℤ^n$ be **how many times** each button is pressed.
+- Let $b ∈ ℤ^m$ be the **target counters**.
+- Counters evolve as a sum: $A x = b$. (We also require $x ≥ 0$ — you can’t press a button a negative number of times.)
 
-Problem consists of 2 parts. First one is to find any **feasible** solution. Feasible solution is a solution that 
-will result in activation of the machine (the output matches).
-Second part is to find an **optimal* solution. Optimal solution is the best one from all feasible solutions,
-in this case it is minimal number of button presses.
+With the sample above, the system becomes:
 
-These 2 parts of the problem we can identify as Linear Algebra and Integer Linear Programming (ILP).
-
-From ILP theory we know, that once we find a feasible solution, we can always find an optimal solution. 
-I will go step by step to show how we can find feasible solutions and then optimal solution, and discuss 
-the techniques which we can use to find it very quickly.
-
-Let's call buttons as $x_1,x_2,x_3,x_4,x_5,x_6$ variables, i.e. the number of times we pressed these buttons.
-
-And output is $b_1,b_2,b_3,b_4$, are counters.
-
-We can translate this input to a system of linear equations:
-
-
-$\begin{aligned}
-a_{11} x_1 + a_{12} x_2 + a_{13} x_3 + a_{14} x_4 + a_{15} x_5 + a_{16} x_6 &= b_1 \\
-a_{21} x_1 + a_{22} x_2 + a_{23} x_3 + a_{24} x_4 + a_{25} x_5 + a_{26} x_6 &= b_2 \\
-a_{31} x_1 + a_{32} x_2 + a_{33} x_3 + a_{34} x_4 + a_{35} x_5 + a_{36} x_6 &= b_3 \\
-a_{41} x_1 + a_{42} x_2 + a_{43} x_3 + a_{44} x_4 + a_{45} x_5 + a_{46} x_6 &= b_4 \\
-\end{aligned}$
-
-In matrix form we can write it as
-
-$A x = b$
-
-Note, $a_{ij} \in \{0,1\}$
-
-or $A \in \{0,1\}^{m \times n}$ in matrix notations, sometimes called as binary matrix.
-
-Using the input from our example above:
-
-$\begin{aligned}
-x_5+x_6=3 \\
-x_2 + x_6 = 5 \\
-x_3 + x_4 + x_5 = 4 \\
-x_1 + x_2 + x_4 = 7
-\end{aligned}$
+$$\begin{aligned}
+x_5 + x_6 & = 3 \\
+x_2 + x_6 & = 5 \\
+x_3 + x_4 + x_5 & = 4 \\
+x_1 + x_2 + x_4 & = 7
+\end{aligned}$$
 
 In matrix form:
 
 $\begin{bmatrix}
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 &amp; 1 \\
-0 &amp; 1 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
-0 &amp; 0 &amp; 1 &amp; 1 &amp; 1 &amp; 0 \\
-1 &amp; 1 &amp; 0 &amp; 1 &amp; 0 &amp; 0
-\end{bmatrix} \times \begin{bmatrix}x_1 \\x_2 \\x_3 \\x_4 \\ x_5 \\ x_6 \end{bmatrix}=\begin{bmatrix} 3 \\ 5 \\ 4 \\ 7 \end{bmatrix}$
+0&0&0&0&1&1\\
+0&1&0&0&0&1\\
+0&0&1&1&1&0\\
+1&1&0&1&0&0
+\end{bmatrix}
+\; x
+=\;
+\begin{bmatrix}3\\5\\4\\7\end{bmatrix}$
 
-Finding values of $x$ variables is equivalent to finding a feasible solution, which may or may not be an optimal solution.
-We will discuss finding optimal solution later, after we found feasible solution.
+---
 
-Before we proceed, it is worth noting that matrix $A$ is of size $m\times n$, where $m \le n$ (usually). 
-Both $m$ and $n$ can be quite large for some machines. There is probably a lot of redundancy in these equations. 
-To remediate large redundancy we can use a technique called SNF decomposition.
+## Part 1 (lights): brute‑force subsets with XOR
+Part 1 treats lights as bits and each button as toggling certain lights. The implementation enumerates all
+non‑empty subsets of buttons (`1..(1<<n)-1`), applies XOR per affected light, and keeps the subset with the fewest
+buttons that matches the target pattern. This is fast enough given puzzle constraints.
 
-SNF decomposition is a very useful technique that reveals many interesting properties of the matrix $A$.
-In our case, we will use it to extract independent (free) variables and finds a basic solution. As the result we will rewrite our
-original equations in parametric form:
+**Key idea:** compute the light vector for a subset and compare to target; track the minimum subset size.
 
-$x = x_0 + N t$
+---
 
-Parametric form will be much more compact in compare with a previous $At=b$, as we can show that number of independent free parameters is usually very small.
+## Part 2 (counters): integer linear programming in parametric form
+We want any **feasible** solution to $A x = b, x ≥ 0$, then the **optimal** one that minimizes total presses.
+The objective is:
+\[
+\min \; \mathbf{1}^\top x = \min \sum_{i=1}^{n} x_i.
+\]
 
-We will use elementary matrix transformation to find $x_0$ and $N$.
+### From equations to a compact parametric form
+Using integer row/column operations (conceptually, Smith/Hermite normal forms), we express the full solution set as:
 
-Using our example, the result of the SNF transformation is:
+$x = x_0 + N t$, where:
 
-$x_0 = \begin{bmatrix} 0 \\ 5 \\ -1 \\ 2 \\ 3 \\ 0 \end{bmatrix}, \
-N=\begin{bmatrix}
-1 &amp; 0 \\
-0 &amp; -1 \\
-1 &amp; 0 \\
--1 &amp; 1 \\
-0 &amp; -1 \\
-0 &amp; 1
-\end{bmatrix},\ t=\begin{bmatrix} t_1 \\ t_2 \end{bmatrix}$
+- $x₀ ∈ ℤ^n$ is **one particular (basis) solution** of $A x = b$,
+- $N ∈ ℤ^{n×k}$ (columns) spans the **integer null‑space** of $A$ ($A N = 0$),
+- $t ∈ ℤ^k$ are the **free integer parameters** (often $k ≤ 3$ in this puzzle’s datasets).
 
-$x_0$ is called a basis solution (constant), $N$ is called a null-space, or kernel, or just a free vectors space, 
-$t$ are our new independent (free) variables.
+This drastically reduces the search space from dimension $n$ to $k$.
 
-So our parametric solution would be:
+> Empirically, across 151 machines in the input, the number of free variables tops out at 3; more than half
+> of the machines have $k=0$ (the base solution is already unique). See distribution below.
 
-$x=x_0+Nt=\begin{bmatrix} 0 \\ 5 \\ -1 \\ 2 \\ 3 \\ 0 \end{bmatrix} + \
-\begin{bmatrix}
-1 &amp; 0 \\
-0 &amp; -1 \\
-1 &amp; 0 \\
--1 &amp; 1 \\
-0 &amp; -1 \\
-0 &amp; 1
-\end{bmatrix} \begin{bmatrix} t_1 \\ t_2 \end{bmatrix}$
+### Feasibility becomes simple inequalities in $t$
+Because $x = x_0 + N t$ and we need $x ≥ 0$, feasibility is just:
 
-As we can see, we have reduced our problem from 6 to 2 independent variables: $t_1,t_2$
+$x_0 + N t \;\ge\; 0 \quad(\text{componentwise})$.
 
-I run the statistic for all machines, it turns out that in worst case scenario we have only 3 independent variables:
+That is, a small set of linear inequalities in the few parameters $t$.
 
-### Free‑variable distribution across 151 machines
+### Objective in $t$
+Since $\mathbf{1}^\top x = \mathbf{1}^\top x_0 + \mathbf{1}^\top N \; t$, and $x_0$ is constant, minimizing
+$\sum x_i$ is equivalent to minimizing the linear form $c^\top t$ where $c = \mathbf{1}^\top N$ (sum of each null‑space column).
 
-| # of free variables | Machines | % of machines | Notes                    |
-|---------------------:|---------:|--------------:|--------------------------|
-| 0                    | 78       | 51.66%        | trivial, ~0 compute time |
-| 1                    | 36       | 23.84%        | trivial, ~0 compute time |
-| 2                    | 31       | 20.53%        | non‑trivial              |
-| 3                    | 6        | 3.97%         | maximum observed         |
-| **Total**            | **151**  | **100.00%**   |                          |
+### Worked example (the sample)
+For the sample, the solver produced:
+$
+x_0 = \begin{bmatrix}0\\5\\-1\\2\\3\\0\end{bmatrix},\quad
+N = \begin{bmatrix}
+1&0\\0&-1\\1&0\\-1&1\\0&-1\\0&1
+\end{bmatrix},\quad
+t = \begin{bmatrix}t_1\\t_2\end{bmatrix}.
+$
 
-As I mentioned earlier, we first look for a feasible solution, and next - optimal solution. That is a 2-phase process.
+The only negative entry in $x_0$ is $x_{0,3}=-1$. Inspecting the third row of $N$ shows that only $t_1$ can fix it
+($N_{3,1}=1$, $N_{3,2}=0$), so feasibility requires $t_1 ≥ 1$. The objective is $\min (1·t_1 + 0·t_2)$, so the minimum is
+$t_1 = 1$ (any $t_2$), and substituting gives:
 
-We can show that any combination of $t_1,t_2$ in parametric form will always produce a solution for $At=b$, 
-that's why it is called a null-space (another advantage of parametric form).
-However, not every solution is feasible, because of the constraints: $x_i \ge 0$. In other terms, number of button clicks can't be negative.
+$x = \begin{bmatrix}1\\5\\0\\1\\3\\0\end{bmatrix},\quad \sum x_i = 10$
 
-We have to rewrite original constraints $x_i \ge 0$ in terms of $t_i$ (or our new null-space).
+---
 
-We can start from a trivial cases, before we come to a more generic form for new constraints.
+## Fast paths before Branch‑and‑Bound (B&B)
+In practice we handle most machines without search:
 
-Case 1 - no free t-variables. It turns out that more than 50% machines have no free variables and solution is very trivial - just a base solution $x_0$
-(todo: include example).
+- **No free variables ($k=0$).** The unique base solution $x_0$ is feasible; it is automatically optimal.
+- **One free variable ($k=1$).** Let the single null‑space column be $f$ and write $x(t) = x_0 + t f$.
+  You can derive a closed form interval $[lb, ub]$ of integer $t$ that makes all components non‑negative.
+  Then choose the best end of the interval based on the reduced cost $c = \sum f_i$:
+    - If $c < 0$, pick $t = ub$ (to decrease the objective).
+    - If $c ≥ 0$, pick $t = lb$.
+      This is constant‑time arithmetic.
 
-Case 2 - one free variable. The solution is still very trivial. We can use a simple formula to calculate single $t_1$ where all $x_i \ge 0$.
+These two cases already solve ~75% of machines instantly.
 
-Case 3 - with 2 or more variables the solution may or may not be that trivial.. In some case we may further reduce it, or fallback to 
-branch-and-bound + simplex method for solving ILP. Even in that case, the search space should be very small, bacaurse parametric 
-form is already close to the feasible solution...Work in progress.
+---
 
-## Minimization (ILP) problem
+## Branch‑and‑Bound + Simplex for the few hard cases ($k ≥ 2$)
+When there are 2 or 3 free variables, we solve the small ILP in $t$ with standard **Branch‑and‑Bound (B&B)** guided by
+**LP relaxation** solved by **Simplex**.
 
-Once we found parametric form that generates solutions, we can focus on ILP problem, i.e. feasibility and optimality.
+### What we relax and why Simplex
+- The ILP in parameters is: minimize $c^\top t$ subject to $x_0 + N t ≥ 0$ and any bounds on $t$.
+- We relax integrality ($t ∈ ℤ^k$ → $t ∈ ℝ^k$) to get a linear program (LP). Simplex quickly finds an optimal LP solution
+  and its **objective value is a lower bound** on any integer solution in that branch. If the LP is infeasible, we can prune the branch.
+- If the LP solution happens to be integral, we are done for that branch. If not, we **branch** on one fractional component.
 
-Case 1, that we discussed earlier, we have already solution $x_0$, this is the only possible feasible solution and it is also optimal.
+### How branching works (high‑level)
+1. Start from the root with wide bounds on each $t_j$ (effectively $(-∞, +∞)$), plus feasibility constraints $x_0 + N t ≥ 0$.
+2. Solve the LP (Simplex). If infeasible, prune. If integral, map $t$ back to $x$ and update the best solution.
+3. Otherwise, pick a fractional $t_i = v$ and split into two children with $t_i ≤ ⌊v⌋$ and $t_i ≥ ⌈v⌉$.
+4. Repeat; use the LP objective to prune any node whose lower bound is not better than the current best.
 
-Case 2, the solution is still trivial we find the smallest non-negative $x_i$ value from parametric form. That is simple arithmetic.
+### Notes specific to this implementation
+- For sign‑mixed ranges on a variable, the search first splits the domain at 0 to separate positive/negative bounds.
+- Internally the LP uses the constraints $−N t ≤ x_0$ (equivalent to $x_0 + N t ≥ 0$) and adds bound constraints per branch.
+- The objective $c = 1^T N$ (sum of each column of $N$) is computed once; Simplex minimizes $c^T t$.
+- After solving the LP, if a branch used the substitution $t' = −t$ for negative ranges, the solution is converted back.
 
-Case 3, is more generic, and we may use in the worst case scenario branch-and-bound and simplex method to work through the edges of the feasible solutions.
+This B&B is cheap here because $k$ is tiny (≤3), so the tree is shallow and Simplex calls are minimal.
 
-Let's use our example again. We found our parametric solution:
+---
 
-$x=x_0+Nt=\begin{bmatrix} 0 \\ 5 \\ -1 \\ 2 \\ 3 \\ 0 \end{bmatrix} + \
-\begin{bmatrix}
-1 &amp; 0 \\
-0 &amp; -1 \\
-1 &amp; 0 \\
--1 &amp; 1 \\
-0 &amp; -1 \\
-0 &amp; 1
-\end{bmatrix} \begin{bmatrix} t_1 \\ t_2 \end{bmatrix}$
+## Empirical null‑space sizes (151 machines)
 
-It has 2 variables $t_1$ and $t_2$, even so it falls in the non-trivial case, I can still find a trivial solution, as shown below.
+| # of free variables | Machines | % of machines | Notes                   |
+|---------------------:|---------:|--------------:|-------------------------|
+| 0                    |       78 |        51.66% | trivial, ~0 compute time|
+| 1                    |       36 |        23.84% | trivial, ~0 compute time|
+| 2                    |       31 |        20.53% | non‑trivial             |
+| 3                    |        6 |         3.97% | maximum observed        |
+| **Total**            |     **151** |     **100.00%** |                         |
 
-To find optimal feasible solution we need:
-- constraints
-- objective
+---
 
-### Constraints
+## Implementation overview (Java)
+- **Input parsing.** Lights pattern (Part 1), button wiring, and counter targets are parsed from each line.
+- **Part 1.** Enumerates button subsets, applies XOR per light, checks equality, and keeps the subset with the minimum size.
+- **Part 2.** Builds $A$ and $b$, computes $(x_0, N)$, then:
+    - If $k=0$: $x_0$ is both feasible and optimal.
+    - If $k=1$: compute $[lb, ub]$ from $x_0 + t f ≥ 0$, choose end by reduced cost $c$.
+    - Else: run B&B with Simplex to minimize $c^T t$ subject to $x_0 + N t ≥ 0$, map $t$ → $x$, and track the best.
 
-Original constraints from $Ax=b$ are:
+---
 
-$x \ge 0$
+## Correctness (intuitive)
+- Any solution to $A x = b$ is captured by $x = x_0 + N t$. Enforcing $x ≥ 0$ in that form is sufficient and necessary
+  because $A N = 0$ by construction.
+- The objective is linear in $t$; LP relaxation provides a valid lower bound. B&B enumerates only the branches needed,
+  and whenever it finds an integral LP solution, that is optimal for that branch. With tiny $k$, the global optimum is
+  found quickly.
 
-Note, that basic solution is not yet feasible because $x_{03}=-1$, we need to find $t$ to make it feasible.
-$t_2$ also does not contribute to feasibility, because $N_{3,2} = 0$.
+---
 
-$t_1$ is the only variable that makes solution feasible and it has to be $t_1 \ge 1$
+## Appendix: one‑variable bounds
+For $x(t) = x_0 + t f$ and $x(t) ≥ 0$, each component yields:
+- If $f_j > 0: t ≥ ⌈−x_{0,j} / f_j⌉$.
+- If $f_j < 0: t ≤ ⌊ x_{0,j} / (−f_j) ⌋$.
+- If $f_j = 0: x_{0,j} ≥ 0$ (otherwise infeasible).
 
-### Objective function
+Take the tightest lower/upper bound over all components, then choose $t$ at the better end according to the reduced cost $c = \sum f_j$.
 
-$z=min \sum x_i$
+---
 
-For our parametric solution, we can write it this way:
-
-$z = min (\sum x_{0i} + \mathbf{1}^\top N t)$
-
-$\mathbf{1}^\top N$ is just a math way to specify sum of the columns in matrix N.
-
-Because $x_0$ is a constant we can just minimize $\mathbf{1}^\top N t$ :
-
-$z = min (\mathbf{1}^\top N t)$
-
-For our example from above, our objective function will be:
-
-$z=min (\begin{bmatrix} 1 && 0 \end{bmatrix} \begin{bmatrix}t_1 \\t_2 \end{bmatrix})=min(t_1)$
-
-Note that $t_2$ does not contribute in our objective, and objective is reduced just to minimizing $t_1$
-
-Taking into account above constraints and objective function,  $min(t_1) = 1 | t_1 \ge 1$
-
-Substituting $t=[1,0]$ into out parametric solution, we get:
-
-$x=x_0+Nt=\begin{bmatrix} 0 \\ 5 \\ -1 \\ 2 \\ 3 \\ 0 \end{bmatrix} + \
-\begin{bmatrix}
-1 &amp; 0 \\
-0 &amp; -1 \\
-1 &amp; 0 \\
--1 &amp; 1 \\
-0 &amp; -1 \\
-0 &amp; 1
-\end{bmatrix} \begin{bmatrix} 1 \\ 0 \end{bmatrix}=
-\begin{bmatrix}
-1 \\
-5 \\
-0 \\
-1 \\
-3 \\
-0
-\end{bmatrix}$
-
-Minimum number of button clicks:
-
-$\sum x_i=10$
-
-
-So, as I have shown, even with 2 independent variables the solution sometimes can be reduced to a trivial minimization of one variable.
-
-
+## Worked sample: final numbers
+Using the sample’s $x_0$ and $N$ above, feasibility forces $t_1 ≥ 1$, the objective reduces to $min(t_1)$, and the minimum is
+$t_1=1$. The resulting press counts are $x = [1,5,0,1,3,0]$ with total $10$ presses.
 
