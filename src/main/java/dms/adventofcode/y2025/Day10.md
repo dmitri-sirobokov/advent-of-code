@@ -125,7 +125,12 @@ The only negative entry in $x_0$ is $x_{0,3}=-1$. Inspecting the third row of $N
 ($N_{3,1}=1$, $N_{3,2}=0$), so feasibility requires $t_1 ≥ 1$. The objective is $\min (1·t_1 + 0·t_2)$, so the minimum is
 $t_1 = 1$ (any $t_2$), and substituting gives:
 
-$x = \begin{bmatrix} 1 \\ 5 \\ 0 \\ 1 \\ 3 \\ 0 \end{bmatrix},\quad \sum x_i = 10$
+$x = \begin{bmatrix} 1 \\
+5 \\
+0 \\
+1 \\
+3 \\
+0 \end{bmatrix},\quad \sum x_i = 10$
 
 ---
 
