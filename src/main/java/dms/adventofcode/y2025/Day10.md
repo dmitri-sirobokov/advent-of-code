@@ -1,7 +1,7 @@
 
 # Advent of Code 2025 — Day 10: Factory
 
-> Goal: explain the implemented approach in clear, practical terms for readers with basic
+> Goal: Describe the implemented approach in clear, practical terms for readers with basic
 > linear algebra knowledge. Covers modeling, the parametric (null-space) form, feasibility,
 > minimization, and the Branch-and-Bound + Simplex strategy used for the few non‑trivial cases.
 
