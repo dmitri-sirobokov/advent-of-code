@@ -48,7 +48,7 @@ x_1 + x_2 + x_4 & = 7
 
 In matrix form:
 
-$\begin{bmatrix}
+$$\begin{bmatrix}
 0&0&0&0&1&1\\
 0&1&0&0&0&1\\
 0&0&1&1&1&0\\
@@ -56,7 +56,7 @@ $\begin{bmatrix}
 \end{bmatrix}
 \; x
 =\;
-\begin{bmatrix}3\\5\\4\\7\end{bmatrix}$
+\begin{bmatrix}3\\5\\4\\7\end{bmatrix}$$
 
 ---
 
@@ -104,9 +104,10 @@ $\sum x_i$ is equivalent to minimizing the linear form $c^\top t$ where $c = \ma
 ### Worked example (the sample)
 For the sample, the solver produced:
 
+
 $$x_0 = \begin{bmatrix} 0 \\ 5 \\ -1 \\ 2 \\ 3 \\ 0 \end{bmatrix},\quad
-N = \begin{bmatrix}  1 & 0 \\ 0 & -1 \\ 1 & 0 \\ -1 & 1\\ 0 & -1 \\ 0 & 1 \end{bmatrix}, \quad
-t = \begin{bmatrix} t_1 \\ t_2 \end{bmatrix}$$
+N = \begin{bmatrix}  1 & 0 \\ 0 & -1 \\ 1 & 0 \\ -1 & 1 \\ 0 & -1 \\ 0 & 1 \end{bmatrix}, \quad
+t = \begin{bmatrix} t_1\\ t_2\\ \end{bmatrix}$$
 
 The only negative entry in $x_0$ is $x_{0,3}=-1$. Inspecting the third row of $N$ shows that only $t_1$ can fix it
 ($N_{3,1}=1$, $N_{3,2}=0$), so feasibility requires $t_1 ≥ 1$. The objective is $\min (1·t_1 + 0·t_2)$, so the minimum is
