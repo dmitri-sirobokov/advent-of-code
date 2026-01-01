@@ -99,7 +99,7 @@ $x_0 + N t \;\ge\; 0 \quad(\text{componentwise})$.
 That is, a small set of linear inequalities in the few parameters $t$.
 
 ### Objective in $t$
-Since $\mathbf{1}^\top x = \mathbf{1}^\top x_0 + \mathbf{1}^\top N \; t$, and $x_0$ is constant, minimizing
+Since $\mathbf{1}^\top x = \mathbf{1}^\top x_0 + \mathbf{1}^\top N t$, and $x_0$ is constant, minimizing
 $\sum x_i$ is equivalent to minimizing the linear form $c^\top t$ where $c = \mathbf{1}^\top N$ (sum of each null‑space column).
 
 ### Worked example (the sample)
@@ -160,7 +160,7 @@ When there are 2 or 3 free variables, we solve the small ILP in $t$ with standar
 - If the LP solution happens to be integral, we are done for that branch. If not, we **branch** on one fractional component.
 
 ### How branching works (high‑level)
-1. Start from the root with wide bounds on each $t_j$ (effectively $(-∞, +∞)$), plus feasibility constraints $x_0 + N t ≥ 0$.
+1. Start from the root with wide bounds on each $t_j$ (effectively $`(-∞, +∞)`$), plus feasibility constraints $x_0 + N t ≥ 0$.
 2. Solve the LP (Simplex). If infeasible, prune. If integral, map $t$ back to $x$ and update the best solution.
 3. Otherwise, pick a fractional $t_i = v$ and split into two children with $t_i ≤ ⌊v⌋$ and $t_i ≥ ⌈v⌉$.
 4. Repeat; use the LP objective to prune any node whose lower bound is not better than the current best.
