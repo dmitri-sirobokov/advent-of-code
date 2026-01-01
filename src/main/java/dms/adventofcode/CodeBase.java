@@ -1,6 +1,8 @@
 package dms.adventofcode;
 
+import dms.adventofcode.math.MatrixInt;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,11 +10,9 @@ import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class CodeBase {
 
@@ -139,8 +139,29 @@ public class CodeBase {
         return result;
     }
 
-    protected static void printArray(int[] array) {
-        System.out.println("[" + Arrays.stream(array).mapToObj(Integer::toString).collect(Collectors.joining(",")) + "]");
+    protected static void printMatrix(String name, MatrixInt m) {
+        if (StringUtils.isNotBlank(name)) {
+            System.out.print(name + " = ");
+        }
+        System.out.printf(m.toString());
+    }
+
+    protected static void printMatrix(String name, int[][] A) {
+        if (StringUtils.isNotBlank(name)) {
+            System.out.print(name + " = ");
+        }
+        System.out.println("{");
+        for (var i = 0; i < A.length; i++) {
+            System.out.print("    { ");
+            for (var j = 0; j < A[0].length; j++) {
+                System.out.print(A[i][j]);
+                if (j != A[0].length - 1) System.out.print(", ");
+            }
+            System.out.print(" }");
+            if (i != A.length - 1) System.out.print(",");
+            System.out.println();
+        }
+        System.out.println("}");
     }
 
     protected static void printMatrix(char[][] matrix) {
@@ -154,19 +175,6 @@ public class CodeBase {
 
     protected static <T> T[][] mapArray(int[][] array, MapArrayFunction<T, Integer> func) {
         return mapArray(array, (x, y, value) -> func.apply(value));
-    }
-
-    /**
-     * Calculate common greatest divisor for integers a and b. Can be useful to calculate a number of repetitions in various algorithms.
-     * See <a href="https://en.wikipedia.org/wiki/Euclidean_algorithm">Euclidean algorithm</a>
-     */
-    protected static int gcd(int a, int b) {
-        while (b != 0) {
-            var t = b;
-            b = a % b;
-            a = t;
-        }
-        return a;
     }
 
     /**

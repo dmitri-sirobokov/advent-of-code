@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static dms.adventofcode.math.MathUtils.gcd;
+
 /**
  * Day 24: Blizzard Basin
  */
@@ -96,7 +98,7 @@ public class Day24 extends CodeBase {
         private final int cacheSize;
 
         public BlizzardsEngine(List<String> input) {
-            sizeX = input.get(0).length() - 2;
+            sizeX = input.getFirst().length() - 2;
             sizeY = input.size() - 2;
             for (var y = 0; y < sizeY; y++) {
                 var line = input.get(y + 1);
