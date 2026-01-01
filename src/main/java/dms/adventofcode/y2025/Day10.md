@@ -1,5 +1,5 @@
 
-# Advent of Code 2025 — Day 10: Factory (Java solution)
+# Advent of Code 2025 — Day 10: Factory
 
 > Goal: explain the implemented approach in clear, practical terms for readers with basic
 > linear algebra knowledge. Covers modeling, the parametric (null-space) form, feasibility,
